@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="vi"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DuyuScript</title>
+<meta name="description" content="DuyuScript - kho script Roblox cập nhật liên tục.">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net/" crossorigin="">
+<link rel="preconnect" href="https://raw.githubusercontent.com/" crossorigin="">
+<link rel="preconnect" href="https://i.ibb.co/" crossorigin="">
+<link rel="preconnect" href="https://wsrv.nl/" crossorigin="">
+<link rel="dns-prefetch" href="https://cdn.jsdelivr.net/">
+<link rel="dns-prefetch" href="https://raw.githubusercontent.com/">
+<link rel="dns-prefetch" href="https://i.ibb.co/">
+<link rel="dns-prefetch" href="https://wsrv.nl/">
+<!-- Font Fredoka giống phong cách hoạt hình -->
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-base: #7eb0d5;
+  --surface: #fcf8eb;
+  --surface-2: #e8dfc8;
+  --surface-hover: #ffffff;
+  --border-color: #3b3b3b;
+  --text-main: #2b2b2b;
+  --text-sub: #555555;
+  --text-dim: #888888;
+  --accent-yellow: #ffca3a;
+  --accent-green: #5cb85c;
+  --radius: 12px;
+  --shadow-hard: 4px 4px 0px rgba(0,0,0,0.15);
+  --shadow-btn: 0 4px 0px var(--border-color);
+}
+
+* { box-sizing: border-box; }
+html { color-scheme: light; }
+body {
+  margin: 0;
+  background-color: var(--bg-base);
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px);
+  background-size: 40px 40px;
+  color: var(--text-main);
+  font-family: 'Fredoka', system-ui, sans-serif;
+  min-height: 100vh;
+  padding-bottom: 40px;
+  -webkit-font-smoothing: antialiased;
+}
+
+.header-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px 10px 20px;
+  max-width: 460px;
+  margin: 0 auto;
+}
+
+/* ===== Ảnh ủng hộ ad (góc trên bên phải, kế avatar) ===== */
+.support-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 108px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+  animation: badgeFloat 2.8s ease-in-out infinite;
+}
+
+@keyframes badgeFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.support-badge img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  border-radius: 12px;
+  border: 3px solid var(--border-color);
+  box-shadow: var(--shadow-hard);
+  background: #fff;
+}
+
+.support-badge .support-text {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  color: #ffffff;
+  background: #e63946;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 3px 6px;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.35);
+}
+
+.avatar-wrapper {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 4px solid var(--border-color);
+  box-shadow: var(--shadow-hard);
+  padding: 2px;
+  margin-bottom: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.avatar-wrapper.playing { animation: musicPulse 1.2s infinite alternate ease-in-out; }
+
+@keyframes musicPulse {
+  0% { transform: scale(1); box-shadow: var(--shadow-hard); }
+  100% { transform: scale(1.05); box-shadow: 0 6px 0px rgba(0,0,0,0.2); border-color: var(--accent-yellow); }
+}
+
+.avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+.profile-name {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-yellow);
+  text-shadow: 2px 2px 0 #333, -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333;
+  margin-bottom: 16px;
+  letter-spacing: 1px;
+}
+
+.audio-player-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #333;
+  border: 3px solid var(--border-color);
+  border-radius: 30px;
+  padding: 8px 18px;
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-hard);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.1s;
+}
+.audio-player-card:active { transform: translateY(4px); box-shadow: none; }
+
+.play-icon-badge {
+  background: var(--accent-green);
+  border: 2px solid var(--border-color);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: white;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 0 var(--border-color);
+}
+
+.audio-info { display: flex; flex-direction: column; flex: 1; margin: 0 12px; }
+.audio-title { font-size: 13px; font-weight: 600; color: #ffffff; }
+.audio-sub { font-size: 11px; color: #aaaaaa; font-weight: 500; }
+
+.equalizer { display: flex; align-items: flex-end; gap: 3px; height: 18px; }
+.eq-bar { width: 4px; background: var(--accent-green); border-radius: 2px; height: 4px; }
+.playing .eq-bar { animation: wave 0.8s infinite ease-in-out alternate; }
+.playing .eq-bar:nth-child(1) { animation-delay: 0.1s; }
+.playing .eq-bar:nth-child(2) { animation-delay: 0.3s; }
+.playing .eq-bar:nth-child(3) { animation-delay: 0.2s; }
+.playing .eq-bar:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes wave { 0% { height: 4px; } 100% { height: 18px; } }
+
+.social-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  margin-bottom: 25px;
+}
+
+.yt-btn, .tt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  width: 100%;
+  min-width: 0;
+  letter-spacing: 0.5px;
+  border: 3px solid var(--border-color);
+  box-shadow: var(--shadow-btn);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.yt-btn { background: #ff0000; }
+.tt-btn { background: #000000; }
+
+.yt-btn:active, .tt-btn:active { transform: translateY(4px); box-shadow: none; }
+
+main { max-width: 800px; margin: 0 auto; padding: 10px 16px; }
+
+.hero-title {
+  text-align: center;
+  font-size: clamp(24px, 6vw, 36px);
+  font-weight: 700;
+  margin: 4px 0;
+  color: #ffffff;
+  text-shadow: 2px 2px 0 var(--border-color), -1px -1px 0 var(--border-color), 1px -1px 0 var(--border-color), -1px 1px 0 var(--border-color), 1px 1px 0 var(--border-color);
+}
+
+.hero-sub {
+  text-align: center;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 24px;
+  text-shadow: 1px 1px 0 var(--border-color);
+}
+
+/* ===== Search wrap + Suggestions ===== */
+.search-wrap { position: relative; margin-bottom: 20px; }
+
+.search-box {
+  background: var(--surface);
+  border: 3px solid var(--border-color);
+  border-radius: 30px;
+  padding: 6px 6px 6px 18px;
+  display: flex;
+  align-items: center;
+  box-shadow: var(--shadow-hard);
+  margin-bottom: 0;
+}
+.search-box input { border: none; outline: none; width: 100%; font-family: inherit; font-size: 15px; color: var(--text-main); background: transparent; font-weight: 500; }
+.search-box input::placeholder { color: var(--text-dim); }
+.search-box button {
+  background: var(--accent-yellow); border: 2px solid var(--border-color); color: var(--text-main);
+  padding: 8px 20px; border-radius: 20px; font-family: inherit; font-weight: 700; font-size: 14px; cursor: pointer;
+  box-shadow: 0 3px 0 var(--border-color); transition: transform .1s, box-shadow .1s;
+}
+.search-box button:active { transform: translateY(3px); box-shadow: none; }
+
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0; right: 0;
+  background: var(--surface);
+  border: 3px solid var(--border-color);
+  border-radius: 16px;
+  box-shadow: var(--shadow-hard);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+  padding: 6px;
+}
+.suggestions.show { display: block; }
+.suggestions .sug-item {
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  transition: background .15s;
+}
+.suggestions .sug-item:hover,
+.suggestions .sug-item.active { background: var(--accent-yellow); }
+
+/* Ẩn nhãn GAME / HUB */
+.suggestions .sug-type { display: none !important; }
+
+.suggestions .sug-empty {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.tags {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tags button {
+  width: 100%; min-width: 0; background: var(--surface); border: 3px solid var(--border-color);
+  padding: 8px 6px; border-radius: 20px; font-family: inherit; font-size: 13px; font-weight: 700;
+  color: var(--text-main); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 6px; line-height: 1.2; text-align: center; white-space: normal; word-break: break-word; overflow: hidden;
+  box-shadow: 0 3px 0 var(--border-color); transition: transform .1s, box-shadow .1s, background .2s;
+}
+.tags button:active { transform: translateY(3px); box-shadow: none; }
+.tags button.on { background: var(--accent-yellow); color: var(--text-main); }
+.tags button span.dot { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 2px solid var(--border-color); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 3px solid var(--border-color);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-hard);
+  display: flex;
+  flex-direction: column;
+  transition: transform .1s, box-shadow .1s;
+}
+.card:active { transform: translateY(4px); box-shadow: none; }
+
+.card-img-box {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  border-bottom: 3px solid var(--border-color);
+}
+
+.card-img-box::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, #d0d0d0 25%, #e8e8e8 50%, #d0d0d0 75%);
+  background-size: 200% 100%; animation: shimmer 1.4s infinite; z-index: 1; transition: opacity .35s ease;
+}
+.card-img-box.loaded::before { opacity: 0; pointer-events: none; }
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+.card-img-box img {
+  width: 100%; height: 100%; object-fit: cover; 
+  object-position: top center;
+  opacity: 0; transition: opacity .35s ease; position: relative; z-index: 2;
+}
+.card-img-box img.img-ready { opacity: 1; }
+
+.card-img-placeholder {
+  color: var(--text-main); font-weight: 700; font-size: 14px; letter-spacing: 0.5px;
+  text-align: center; padding: 0 8px; position: relative; z-index: 2;
+}
+
+.card-body { padding: 12px; display: flex; flex-direction: column; flex: 1; }
+
+.card-title {
+  font-size: 20px; 
+  font-weight: 700; 
+  margin: 0 0 12px 0; 
+  color: var(--text-main); 
+  line-height: 1.3;
+  text-align: center;
+}
+
+.game-name { 
+  color: #e63946; 
+  font-weight: 600; 
+  display: block; 
+  margin-top: 6px; 
+  font-size: 16px; 
+}
+
+.card-footer {
+  margin-top: auto; display: flex; justify-content: space-between; align-items: center;
+  gap: 6px; padding-top: 10px; border-top: 2px dashed rgba(0,0,0,0.1);
+}
+
+.btn-link {
+  flex: 1; text-align: center; background: #ffffff; border: 2px solid var(--border-color);
+  color: var(--text-main); text-decoration: none; font-weight: 700; font-size: 13px; padding: 8px 0;
+  border-radius: 8px; transition: all .1s ease; display: flex; justify-content: center; align-items: center;
+  box-shadow: 0 3px 0 var(--border-color);
+}
+.btn-link:active { transform: translateY(3px); box-shadow: none; background: #f0f0f0; }
+
+.btn-sub { background: #f4f4f4; }
+
+.pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 30px; flex-wrap: wrap; }
+.pagination button {
+  background: #ffffff; border: 2px solid var(--border-color); padding: 8px 16px; border-radius: 10px;
+  font-family: inherit; font-size: 14px; font-weight: 700; color: var(--text-main); cursor: pointer;
+  box-shadow: 0 3px 0 var(--border-color); transition: all 0.1s ease;
+}
+.pagination button:active:not(:disabled) { transform: translateY(3px); box-shadow: none; }
+.pagination button.active { background: var(--accent-yellow); }
+.pagination button:disabled { opacity: 0.5; cursor: not-allowed; background: #ddd; }
+
+@media (max-width: 480px) {
+  .tags { grid-template-columns: repeat(2, 1fr); }
+  .grid { gap: 8px; }
+  .card-body { padding: 10px 6px; }
+  .card-title { font-size: 16px; } 
+  .game-name { font-size: 14px; margin-top: 4px; }
+  .btn-link { font-size: 11px; padding: 6px 0; }
+
+  /* Badge nhỏ lại cho gọn trên điện thoại */
+  .support-badge { width: 78px; top: 8px; right: 8px; gap: 4px; }
+  .support-badge .support-text { font-size: 9px; padding: 2px 4px; border-radius: 6px; }
+}
+
+.card{animation:cardIn .35s cubic-bezier(.2,.8,.2,1) backwards}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.qr-top{max-width:460px;margin:0 auto;padding:18px 20px 0;display:flex;justify-content:center}.qr-top[hidden]{display:none}
+.qr-card{display:flex;flex-direction:column;align-items:center;gap:8px;font:inherit;font-weight:700;font-size:14px;color:var(--text-main);background:var(--surface);border:3px solid var(--border-color);border-radius:16px;padding:12px 14px;box-shadow:var(--shadow-hard);cursor:zoom-in;transition:transform .15s,box-shadow .15s;animation:cardIn .4s cubic-bezier(.2,.8,.2,1) backwards}
+.qr-card:hover{transform:translateY(-2px)}.qr-card:active{transform:translateY(2px);box-shadow:none}
+.qr-card img{width:168px;height:168px;object-fit:contain;background:#fff;border:3px solid var(--border-color);border-radius:10px;display:block}
+.qr-zoom{position:fixed;inset:0;z-index:998;background:rgba(30,40,55,.8);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;animation:fadeIn .18s ease-out}
+.qr-zoom img{width:min(86vw,420px);background:#fff;border:4px solid var(--border-color);border-radius:16px;padding:10px;box-shadow:var(--shadow-hard)}
+.ft{text-align:center;color:#fff;font-size:13px;font-weight:600;padding:8px 16px 0;text-shadow:1px 1px 0 var(--border-color)}
+.ft button{font:inherit;font-size:12px;color:var(--text-main);background:var(--surface);border:2px solid var(--border-color);border-radius:20px;padding:3px 12px;margin-left:6px;cursor:pointer;box-shadow:0 2px 0 var(--border-color);transition:transform .12s}
+.ft button:hover{transform:translateY(-1px)} .ft button:active{transform:translateY(2px);box-shadow:none}
+#adm{display:none;position:fixed;inset:0;z-index:999;background:rgba(30,40,55,.72);overflow:auto;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#adm.on{display:block;animation:fadeIn .18s ease-out}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes shake{25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.a-box{background:var(--surface);border:3px solid var(--border-color);border-radius:16px;box-shadow:var(--shadow-hard);animation:pop .25s cubic-bezier(.2,.8,.2,1)}
+.a-login{max-width:360px;margin:14vh auto 0;padding:26px 22px;text-align:center}
+.a-login h2{margin:0 0 4px;font-size:24px}.a-login p{margin:0 0 16px;color:var(--text-sub);font-size:14px}
+.a-login.err{animation:shake .35s}
+#adm input,#adm select,#adm textarea{font:inherit;font-size:14px;width:100%;padding:9px 12px;border:3px solid var(--border-color);border-radius:var(--radius);background:#fff;color:var(--text-main);outline:none}
+#adm input:focus,#adm select:focus{border-color:var(--accent-yellow);box-shadow:0 0 0 3px rgba(255,202,58,.45)}
+.a-btn{font:inherit;font-weight:600;font-size:13px;cursor:pointer;color:#fff;background:var(--accent-green);border:3px solid var(--border-color);border-radius:var(--radius);padding:8px 14px;box-shadow:var(--shadow-btn);transition:transform .1s,box-shadow .1s}
+.a-btn:hover{transform:translateY(-1px)}.a-btn:active{transform:translateY(4px);box-shadow:none}
+.a-btn.g{background:var(--surface-2);color:var(--text-main)}.a-btn.r{background:#e63946}.a-btn.s{padding:5px 10px;font-size:12px;box-shadow:0 3px 0 var(--border-color)}
+.a-wrap{max-width:1040px;margin:18px auto;display:grid;grid-template-columns:200px 1fr;gap:14px;padding:0 12px}
+.a-side{padding:12px;align-self:start;position:sticky;top:12px}
+.a-side b{display:block;font-size:18px;margin:2px 6px 10px}
+.a-side button{display:block;width:100%;text-align:left;font:inherit;font-weight:600;font-size:14px;padding:9px 12px;margin-bottom:6px;border:2px solid transparent;border-radius:10px;background:none;cursor:pointer;color:var(--text-main);transition:background .12s}
+.a-side button:hover{background:#fff}.a-side button.on{background:var(--accent-yellow);border-color:var(--border-color)}
+.a-main{padding:18px;min-width:0}.a-main h2{margin:0 0 14px;font-size:22px}
+.a-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.a-stat{background:#fff;border:3px solid var(--border-color);border-radius:var(--radius);padding:12px}.a-stat i{font-style:normal;font-size:28px;font-weight:700;display:block}.a-stat span{font-size:12px;color:var(--text-sub)}
+.a-bar{display:flex;align-items:center;gap:8px;font-size:13px;margin:6px 0}.a-bar em{flex:0 0 190px;font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.a-bar div{height:12px;background:var(--accent-yellow);border:2px solid var(--border-color);border-radius:8px;min-width:4px}
+.a-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.a-row label,.a-f label{font-size:12px;font-weight:600;color:var(--text-sub);display:block;margin:0 0 4px}.a-f{margin-bottom:10px}
+.a-tb{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}.a-tb input{flex:1;min-width:160px;width:auto}
+.a-tbl{width:100%;border-collapse:collapse;font-size:13px}.a-tbl td{padding:8px 6px;border-bottom:2px dashed var(--surface-2);vertical-align:middle}
+.a-tbl img{width:64px;height:36px;object-fit:cover;border-radius:6px;border:2px solid var(--border-color);background:#ddd;display:block}
+.a-tbl small{color:var(--text-dim)}.a-acts{white-space:nowrap;text-align:right}.a-acts .a-btn{margin-left:4px}
+.a-form{background:#fff;border:3px solid var(--border-color);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+.a-note{font-size:13px;color:var(--text-sub);background:#fff6d6;border:2px solid var(--border-color);border-radius:10px;padding:10px 12px;margin:10px 0;line-height:1.5}
+.a-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+#aToast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#333;color:#fff;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:600;z-index:1000;border:3px solid var(--border-color);animation:pop .2s}
+@media(max-width:720px){.a-wrap{grid-template-columns:1fr}.a-side{position:static;display:flex;gap:6px;overflow-x:auto}.a-side b{display:none}.a-side button{white-space:nowrap;margin:0;width:auto}.a-row{grid-template-columns:1fr}.a-bar em{flex-basis:110px}.a-main{padding:14px}}
+@media(prefers-reduced-motion:reduce){.card,#adm,#adm *,.a-box,#aToast{animation:none!important;transition:none!important}}
+.nx{flex:0 0 auto;width:30px;height:30px;margin-right:8px;border-radius:50%;border:2px solid var(--border-color);background:#fff;color:var(--text-main);font-size:13px;line-height:1;cursor:pointer;box-shadow:0 2px 0 var(--border-color);transition:transform .1s}.nx:hover{transform:translateY(-1px)}.nx:active{transform:translateY(2px);box-shadow:none}.a-tbl small{word-break:break-all}:root{--e-out:cubic-bezier(.23,1,.32,1)}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+.avatar-wrapper{animation:popIn .5s var(--e-out) backwards}
+.profile-name{animation:rise .4s var(--e-out) .08s backwards}
+.audio-player-card{animation:rise .4s var(--e-out) .16s backwards}
+.social-row{animation:rise .4s var(--e-out) .24s backwards}
+.hero-title,.hero-sub,.search-wrap,.tags{animation:rise .4s var(--e-out) .3s backwards}
+.card{transition:transform .2s var(--e-out),box-shadow .2s var(--e-out)}
+.card-img-box img{transition:opacity .35s ease,transform .3s var(--e-out)}
+.btn-link,.pagination button,.tags button,.search-box button,.yt-btn,.tt-btn{transition:transform .15s var(--e-out),box-shadow .15s var(--e-out),background-color .15s}
+.btn-link{position:relative;overflow:hidden}
+.btn-link::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.75) 50%,transparent 70%);transform:translateX(-120%)}
+@media(hover:hover){
+.card:hover{transform:translateY(-3px);box-shadow:6px 8px 0 rgba(0,0,0,.18)}
+.card:hover .card-img-box img{transform:scale(1.03)}
+.avatar-wrapper:hover{transform:scale(1.06)}
+.btn-link:hover::after{transform:translateX(120%);transition:transform .55s var(--e-out)}
+.btn-link:hover,.pagination button:hover:not(:disabled),.tags button:hover,.yt-btn:hover,.tt-btn:hover,.search-box button:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--border-color)}
+}
+.card:active{transform:translateY(2px)}
+.btn-link:active,.pagination button:active:not(:disabled),.tags button:active,.yt-btn:active,.tt-btn:active,.search-box button:active{transform:translateY(3px);box-shadow:none}
+.btn-copy{flex:0 0 38px;font-family:inherit;cursor:pointer;padding:8px 0}
+.btn-copy.ok{background:var(--accent-green);color:#fff}
+.search-box #clr{background:transparent!important;border:none!important;box-shadow:none!important;padding:4px 10px!important;font-size:16px;color:var(--text-dim);cursor:pointer;transform:none!important}
+.search-box #clr[hidden]{display:none}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent-yellow);outline-offset:2px}
+#prog{position:fixed;top:0;left:0;right:0;height:5px;background:var(--accent-yellow);border-bottom:2px solid var(--border-color);transform:scaleX(0);transform-origin:left;z-index:90;pointer-events:none}
+.fab-wrap{position:fixed;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px;z-index:80}
+.fab{width:48px;height:48px;border-radius:50%;border:3px solid var(--border-color);background:var(--surface);color:var(--text-main);font-size:20px;line-height:1;cursor:pointer;box-shadow:0 4px 0 var(--border-color);opacity:0;transform:translateY(12px) scale(.9);pointer-events:none;transition:opacity .2s var(--e-out),transform .2s var(--e-out),box-shadow .15s}
+.fab.show{opacity:1;transform:none;pointer-events:auto}
+@media(hover:hover){.fab.show:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--border-color)}}
+.fab.show:active{transform:translateY(3px);box-shadow:0 1px 0 var(--border-color)}
+#fabDon{background:#ffb3c1}
+@media(prefers-reduced-motion:reduce),(prefers-reduced-motion:no-preference){html.no-fx *,html.no-fx *::after{animation:none!important;transition:none!important}}
+@media(prefers-reduced-motion:reduce){*,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.fab{transform:none}}
+.card:nth-child(1){animation-delay:0.00s}.card:nth-child(2){animation-delay:0.04s}.card:nth-child(3){animation-delay:0.08s}.card:nth-child(4){animation-delay:0.12s}.card:nth-child(5){animation-delay:0.16s}.card:nth-child(6){animation-delay:0.20s}.card:nth-child(7){animation-delay:0.24s}.card:nth-child(8){animation-delay:0.28s}.card:nth-child(9){animation-delay:0.32s}.card:nth-child(10){animation-delay:0.36s}.card:nth-child(11){animation-delay:0.40s}.card:nth-child(12){animation-delay:0.44s}:root{--spring:cubic-bezier(.34,1.56,.64,1)}
+@keyframes gridMove{to{transform:translate(40px,40px)}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes ring{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.7);opacity:0}}
+@keyframes bounceIn{0%{opacity:0;transform:translateY(28px) scale(.86)}60%{opacity:1;transform:translateY(-5px) scale(1.02)}100%{transform:none}}
+@keyframes charIn{from{opacity:0;transform:translateY(.6em) scale(.6)}to{opacity:1;transform:none}}
+@keyframes jump{40%{transform:translateY(-.35em)}}
+@keyframes rip{from{transform:scale(0);opacity:.55}to{transform:scale(1);opacity:0}}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.2) rotate(180deg);opacity:0}}
+@keyframes bub{0%{transform:translateY(0) scale(.8);opacity:0}15%{opacity:.7}100%{transform:translateY(-110vh) scale(1.1) rotate(40deg);opacity:0}}
+@keyframes pulseRing{0%{box-shadow:0 4px 0 var(--border-color),0 0 0 0 rgba(255,202,58,.8)}100%{box-shadow:0 4px 0 var(--border-color),0 0 0 14px rgba(255,202,58,0)}}
+.wv span{display:inline-block;white-space:pre}
+.fx-bg{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.bub{position:absolute;bottom:-60px;border-radius:50%;border:3px solid rgba(255,255,255,.6);background:rgba(255,255,255,.14);opacity:0;display:none}
+main,.qr-top,.ft{position:relative;z-index:1}.header-container{z-index:1}
+.tags button,.pagination button,.yt-btn,.tt-btn,.search-box button{position:relative;overflow:hidden}
+.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.75);pointer-events:none;animation:rip .55s var(--e-out) forwards}
+.spk{position:fixed;z-index:200;pointer-events:none;font-size:15px;line-height:1;animation:spark .65s var(--e-out) forwards}
+.search-box{transition:box-shadow .2s var(--e-out),transform .2s var(--e-out)}
+html.fx-strong body{background-image:none}
+html.fx-strong .fx-bg::before{content:"";position:absolute;inset:-80px;background-image:linear-gradient(rgba(255,255,255,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.13) 1px,transparent 1px);background-size:40px 40px;animation:gridMove 5s linear infinite}
+html.fx-strong .bub{display:block;animation:bub var(--d,14s) linear var(--dl,0s) infinite}
+html.fx-strong .avatar-wrapper:not(.playing){animation:popIn .5s var(--spring) backwards,floatY 3.2s ease-in-out .6s infinite}
+html.fx-strong .avatar-wrapper.playing::before,html.fx-strong .avatar-wrapper.playing::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:4px solid var(--accent-yellow);pointer-events:none;animation:ring 1.8s ease-out infinite}
+html.fx-strong .avatar-wrapper.playing::after{animation-delay:.9s}
+html.fx-strong .wv-in span{animation:charIn .5s var(--spring) backwards;animation-delay:calc(var(--i)*.045s + .15s)}
+html.fx-strong .profile-name,html.fx-strong .hero-title{animation:none}
+html.fx-strong .profile-name:hover span{animation:jump .45s var(--e-out) calc(var(--i)*.04s)}
+html.fx-strong .card{animation-name:bounceIn;animation-duration:.55s;animation-timing-function:var(--e-out)}
+html.fx-strong .tags button.on{animation:bounceIn .4s var(--spring)}
+html.fx-strong .search-box:focus-within{transform:scale(1.015);box-shadow:0 0 0 4px rgba(255,202,58,.65),var(--shadow-hard)}
+html.fx-strong .fab.show#fabRnd,html.fx-strong .fab.show#fabDon{animation:pulseRing 2.2s ease-out infinite}
+@media(hover:hover){
+html.fx-strong .card:hover{transform:translateY(-6px);box-shadow:8px 12px 0 rgba(0,0,0,.2)}
+html.fx-strong .card:hover .card-img-box img{transform:scale(1.06)}
+html.fx-strong .btn-link:hover,html.fx-strong .tags button:hover,html.fx-strong .yt-btn:hover,html.fx-strong .tt-btn:hover,html.fx-strong .search-box button:hover,html.fx-strong .pagination button:hover:not(:disabled){transform:translateY(-3px) scale(1.04)}
+html.fx-strong .avatar-wrapper:hover{transform:scale(1.1)}
+}
+/* ===== Khung QR donate: nổi bật ===== */
+@keyframes qrGlow{0%{box-shadow:var(--shadow-hard),0 0 0 0 rgba(255,202,58,.9)}100%{box-shadow:var(--shadow-hard),0 0 0 24px rgba(255,202,58,0)}}
+@keyframes qrFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes twinkle{0%,100%{transform:scale(.4) rotate(0);opacity:.4}50%{transform:scale(1.25) rotate(90deg);opacity:1}}
+@keyframes scan{from{transform:translateY(-16px)}to{transform:translateY(170px)}}
+@keyframes beat{0%,100%{transform:scale(1)}15%{transform:scale(1.35)}30%{transform:scale(1)}45%{transform:scale(1.25)}}
+@keyframes shineTxt{from{background-position:100% 0}to{background-position:0 0}}
+.qr-card{position:relative;animation:bounceIn .6s var(--spring) backwards,qrGlow 2s ease-out .7s infinite}
+.qr-card img{transition:transform .3s var(--e-out)}
+.qr-imgwrap{position:relative;display:block;width:168px;height:168px;border-radius:10px;overflow:hidden}
+.qr-zoom img{animation:popIn .35s var(--spring)}
+@media(hover:hover){.qr-card:hover{transform:translateY(-4px) scale(1.04)}.qr-card:hover img{transform:scale(1.05)}}
+html.fx-strong .qr-top{animation:qrFloat 3.4s ease-in-out .8s infinite}
+html.fx-strong .qr-imgwrap::after{content:"";position:absolute;left:0;right:0;top:0;height:16px;pointer-events:none;background:linear-gradient(transparent,rgba(92,184,92,.65),transparent);animation:scan 2.2s ease-in-out infinite alternate}
+html.fx-strong .qr-card::before,html.fx-strong .qr-card::after{position:absolute;font-size:24px;line-height:1;pointer-events:none;animation:twinkle 1.6s ease-in-out infinite}
+html.fx-strong .qr-card::before{content:"✦";top:-14px;left:-10px;color:#ffca3a;text-shadow:0 0 6px #fff}
+html.fx-strong .qr-card::after{content:"★";right:-10px;bottom:-14px;color:#ff4fa3;text-shadow:0 0 6px #fff;animation-delay:.8s}
+html.fx-strong #qrTxt{background:linear-gradient(90deg,#2b2b2b 35%,#e63946 50%,#2b2b2b 65%) 0 0/250% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shineTxt 2.4s linear infinite}
+html.fx-strong #qrTxt::before{content:"❤";display:inline-block;margin-right:6px;-webkit-text-fill-color:#e63946;animation:beat 1.2s ease-in-out infinite}
+</style>
+</head>
+<body>
+
+<!-- Audio: preload none để không tải nhạc khi vào trang -->
+<audio id="bgAudio" loop="" playsinline="" preload="none">
+  </audio>
+
+<section class="qr-top" id="qrTop" hidden><button type="button" class="qr-card" id="qrBtn" aria-label="Phóng to mã QR"><span class="qr-imgwrap"><img id="qrImg" alt="Mã QR ủng hộ" decoding="async"></span><span id="qrTxt"></span></button></section>
+<div class="header-container">
+
+  <!-- ===== Ảnh ủng hộ ad + chữ ===== -->
+
+  <div class="avatar-wrapper" id="avatarFrame">
+    <img class="avatar-img" id="avImg" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2ZmY2EzYSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNTAiIHI9IjM4IiBmaWxsPSIjZmNmOGViIiBzdHJva2U9IiMzYjNiM2IiIHN0cm9rZS13aWR0aD0iNSIvPjx0ZXh0IHg9IjUwIiB5PSI2NiIgZm9udC1zaXplPSI0NiIgZm9udC13ZWlnaHQ9IjcwMCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLHNhbnMtc2VyaWYiIGZpbGw9IiMzYjNiM2IiPkQ8L3RleHQ+PC9zdmc+" alt="DuyuScript" decoding="async" fetchpriority="high">
+  </div>
+  <div class="profile-name" id="pName">DuyuScript</div>
+
+  <div class="audio-player-card" id="playerWidget" onclick="manualPlayTrigger()">
+    <div class="play-icon-badge" id="iconBadge">▶</div>
+    <div class="audio-info">
+      <span class="audio-title" id="aTitle"> Em Ơi Anh Phải Làm Sao</span>
+      <span class="audio-sub" id="audioStatus">Nhạc đã tắt • Chạm để bật</span>
+    </div>
+    <button type="button" class="nx" id="nxBtn" aria-label="Bài tiếp theo">⏭</button>
+      <div class="equalizer" id="equalizer">
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+      <div class="eq-bar"></div>
+    </div>
+  </div>
+
+  <div class="social-row">
+    <a class="yt-btn" id="ytBtn" href="https://www.youtube.com/@PainPHOne1" target="_blank" rel="noopener">
+      ▶ YOUTUBE
+    </a>
+    <a class="tt-btn" id="ttBtn" href="https://www.tiktok.com/@0painph10?_r=1&amp;_t=ZS-9AcqbYeLDCD" target="_blank" rel="noopener">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M16.6 5.82a5.19 5.19 0 0 0 3.4 1.25V10a8.1 8.1 0 0 1-3.53-.86v5.48a6.15 6.15 0 1 1-6.15-6.15c.34 0 .67.03 1 .09v3.15a3.05 3.05 0 1 0 2.15 2.91V2h2.98a5.19 5.19 0 0 0 .15 3.82z"></path>
+      </svg>
+      TIKTOK
+    </a>
+  </div>
+</div>
+
+<main>
+  <h1 class="hero-title" id="hTitle">Nếu Script Game Nào Chưa Update Hoặc Lỗi Ib TikTok Ad</h1>
+  <div class="hero-sub" id="hSub">Lưu Ý Tìm Kiếm Hãy Ghi Tiếng Anh</div>
+
+  <div class="search-wrap">
+    <div class="search-box">
+      <input id="q" type="search" placeholder="Tìm kiếm script..." autocomplete="off" spellcheck="false">
+      <button id="clr" type="button" aria-label="Xoá tìm kiếm" hidden>✕</button>
+      <button id="go" type="button">Tìm</button>
+    </div>
+    <div class="suggestions" id="suggestions" role="listbox" aria-label="Gợi ý tìm kiếm"></div>
+  </div>
+
+  <div class="tags" id="tags">
+    <button class="on" onclick="changeCat('Tất Cả')">
+      <span class="dot" style="background:#ff4fa3"></span>
+      <span>Tất Cả</span>
+    </button>
+  
+    <button class="" onclick="changeCat('Attack On Titan Revolution')">
+      <span class="dot" style="background:#a855f7"></span>
+      <span>Attack On Titan Revolution</span>
+    </button>
+  
+    <button class="" onclick="changeCat('King Legacy')">
+      <span class="dot" style="background:#38bdf8"></span>
+      <span>King Legacy</span>
+    </button>
+  
+    <button class="" onclick="changeCat('Tất Cả Script Game Câu Cá')">
+      <span class="dot" style="background:#ffca3a"></span>
+      <span>Tất Cả Script Game Câu Cá</span>
+    </button>
+  
+    <button class="" onclick="changeCat('99 Nights In The Forest')">
+      <span class="dot" style="background:#ff4fa3"></span>
+      <span>99 Nights In The Forest</span>
+    </button>
+  
+    <button class="" onclick="changeCat('Throw Food For Animals')">
+      <span class="dot" style="background:#a855f7"></span>
+      <span>Throw Food For Animals</span>
+    </button>
+  </div>
+  <div class="grid" id="list"></div>
+  <div class="pagination" id="pagination"></div>
+</main>
+<footer class="ft">© <span id="yr"></span> <b id="ftName">DuyuScript</b> · <button id="admBtn" type="button">⚙ Admin</button></footer>
+
+<script>
+/* ============ Player: mp3 + YouTube ============ */
+const audio=document.getElementById('bgAudio'),avatarFrame=document.getElementById('avatarFrame'),playerWidget=document.getElementById('playerWidget'),audioStatus=document.getElementById('audioStatus'),iconBadge=document.getElementById('iconBadge'),nxBtn=document.getElementById('nxBtn');
+let ytErr=0,isPlaying=false,userPaused=false,ti=0,yt=null,ytReady=false,ytCur='',ytQ=[],lastSig='',errN=0;
+const ytId=u=>{const m=String(u||'').match(/(?:youtu\.be\/|[?&]v=|embed\/|shorts\/|live\/)([\w-]{11})/);return m?m[1]:null};
+const tracks=()=>CFG.tracks||[];
+const EV=['pointerdown','touchstart','click','scroll'];
+function dropListeners(){EV.forEach(e=>document.removeEventListener(e,unlock))}
+function ui(on){
+  isPlaying=on;avatarFrame.classList.toggle('playing',on);playerWidget.classList.toggle('playing',on);
+  iconBadge.innerText=on?'♫':'▶';audioStatus.innerText=on?'Đang phát • Chạm để tắt':'Nhạc đã tắt • Chạm để bật';
+  if(on){errN=0;dropListeners()}
+}
+const ytMsg=c=>c===101||c===150?'Video này chủ kênh không cho nhúng':c===153?'YouTube chặn: hãy mở web bằng https/localhost':c===2?'Link YouTube không hợp lệ':(c===100||c===5)?'Video không tồn tại / không phát được':'';
+function fail(){if(++errN<tracks().length)go(ti+1,true);else{ui(false);audioStatus.innerText=(ytErr&&ytMsg(ytErr))||(location.protocol==='file:'&&tracks().some(t=>ytId(t.u))?'Mở web bằng https/localhost để phát YouTube':'Không phát được nhạc');dropListeners()}}
+function withYT(fn){
+  if(ytReady)return fn();ytQ.push(fn);
+  if(window.__ytLoading)return;window.__ytLoading=true;
+  const d=document.createElement('div');d.style.cssText='position:fixed;left:-9999px;top:0;width:200px;height:200px;overflow:hidden';d.innerHTML='<div id="ytHost"></div>';document.body.appendChild(d);
+  window.onYouTubeIframeAPIReady=()=>{yt=new YT.Player('ytHost',{width:'200',height:'200',playerVars:{playsinline:1,controls:0},events:{
+    onReady:()=>{ytReady=true;ytQ.splice(0).forEach(f=>f())},
+    onStateChange:e=>{if(e.data===1)ui(true);else if(e.data===2)ui(false);else if(e.data===0)ended()},
+    onError:e=>{ytErr=e.data;fail()}}})};
+  const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>{ytErr=0;fail()};document.head.appendChild(s);
+}
+function playNow(){
+  const t=tracks()[ti];if(!t)return;const id=ytId(t.u);
+  if(id){audio.pause();withYT(()=>{if(ytCur===id)yt.playVideo();else{ytCur=id;yt.loadVideoById(id)}})}
+  else{if(ytReady)try{yt.stopVideo()}catch(e){}ytCur='';if(audio.getAttribute('src')!==t.u)audio.src=t.u;audio.play().then(()=>ui(true)).catch(()=>{audioStatus.innerText='Chạm để bật nhạc'})}
+}
+function pauseNow(){audio.pause();if(ytReady)try{yt.pauseVideo()}catch(e){}ui(false)}
+function show(){const T=tracks(),t=T[ti];document.getElementById('aTitle').textContent=t?(t.t||'Nhạc nền'):'';playerWidget.style.display=t?'':'none';nxBtn.style.display=T.length>1?'':'none';audio.loop=T.length<2}
+function go(i,play){const n=tracks().length;if(!n)return;ti=(i+n)%n;show();if(play)playNow()}
+function ended(){if(tracks().length<2){if(yt){yt.seekTo(0);yt.playVideo()}}else go(ti+1,true)}
+function applyTracks(){const sig=JSON.stringify(tracks());if(sig===lastSig)return;lastSig=sig;ti=0;errN=0;show();if(!tracks().length){if(isPlaying)pauseNow()}else if(isPlaying)playNow()}
+let lastUnlock=0;
+function manualPlayTrigger(){if(Date.now()-lastUnlock<1200)return;if(isPlaying){userPaused=true;pauseNow()}else{userPaused=false;playNow()}}
+function unlock(){if(userPaused||isPlaying)return;lastUnlock=Date.now();playNow()}
+audio.addEventListener('ended',()=>go(ti+1,true));
+audio.addEventListener('error',fail);
+nxBtn.addEventListener('click',e=>{e.stopPropagation();userPaused=false;go(ti+1,true)});
+EV.forEach(e=>document.addEventListener(e,unlock,{passive:true}));
+window.addEventListener('DOMContentLoaded',()=>{
+  /* Nạp sẵn YouTube player để lần chạm đầu tiên phát được ngay (trình duyệt chỉ cho phát khi đang trong thao tác chạm) */
+  const t0=tracks()[ti],id0=t0&&ytId(t0.u);
+  if(id0)withYT(()=>{if(!ytCur){ytCur=id0;try{yt.cueVideoById(id0)}catch(e){}}});
+  setTimeout(()=>{if(!userPaused&&!isPlaying)playNow()},2000);
+});
+
+/* ============ Fast CDN rewrite + image resize ============ */
+function fastCDN(url){
+  if (!url) return url;
+
+  const m = url.match(/^https:\/\/raw\.githubusercontent\.com\/([^/]+)\/([^/]+)\/(.+)$/);
+  if (m) {
+    const [, user, repo, rest] = m;
+    let branch, path;
+    if (rest.startsWith('refs/heads/')) {
+      const after = rest.slice(11);
+      const s = after.indexOf('/');
+      if (s !== -1) { branch = after.slice(0, s); path = after.slice(s + 1); }
+    } else {
+      const s = rest.indexOf('/');
+      if (s !== -1) { branch = rest.slice(0, s); path = rest.slice(s + 1); }
+    }
+    if (branch && path) {
+      return `https://cdn.jsdelivr.net/gh/${user}/${repo}@${branch}/${path}`;
+    }
+    return url;
+  }
+
+  if (/^https:\/\/i\.ibb\.co\//.test(url)) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=640&output=webp&q=75`;
+  }
+
+  return url;
+}
+
+/* ============ Data ============ */
+
+/* ============ Supabase cloud sync ============ */
+// Dán Project URL và anon/public key của Supabase vào 2 dòng dưới.
+// KHÔNG BAO GIỜ đặt service_role key trong website.
+const SUPABASE_URL = 'https://nzalxxuknbqckvsvecnd.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_Ljr_bosmK5yVuKuAP6eo2A_i6ecuX-r';
+const ADMIN_EMAIL = 'duyustorerbl@gmail.com';
+const SB_CONFIGURED = /^https:\/\//.test(SUPABASE_URL) && !!SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes('YOUR_');
+const sb = SB_CONFIGURED && window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+let sbHasRemoteData = false, sbSyncTimer = null, sbSyncBusy = false, sbLoadPromise = Promise.resolve();
+const LS=k=>{try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}};
+function SV(k,v){try{localStorage.setItem(k,JSON.stringify(v));scheduleCloudSync();return true}catch(e){return false}}
+function cloudPayload(){return {scripts:SCRIPTS,cfg:CFG};}
+function scheduleCloudSync(){
+  if(!sb) return;
+  clearTimeout(sbSyncTimer);
+  sbSyncTimer=setTimeout(async()=>{
+    if(sbSyncBusy){scheduleCloudSync();return;}
+    const {data:{session}}=await sb.auth.getSession();
+    if(!session)return;
+    sbSyncBusy=true;
+    const {error}=await sb.from('duyuscript_data').upsert({id:'main',payload:cloudPayload(),updated_at:new Date().toISOString(),updated_by:session.user.id},{onConflict:'id'});
+    sbSyncBusy=false;
+    if(error) console.error('DuyuScript cloud sync:',error.message);
+    else {sbHasRemoteData=true; console.info('DuyuScript đã đồng bộ Supabase');}
+  },650);
+}
+async function loadCloudData(){
+  if(!sb)return;
+  const {data,error}=await sb.from('duyuscript_data').select('payload').eq('id','main').maybeSingle();
+  if(error){console.warn('Không tải được dữ liệu Supabase:',error.message);return;}
+  if(data && data.payload && Array.isArray(data.payload.scripts)){
+    sbHasRemoteData=true; SCRIPTS=data.payload.scripts;
+    CFG=Object.assign({},DEF_CFG,data.payload.cfg||{});
+    try{localStorage.setItem('dv_scripts',JSON.stringify(SCRIPTS));localStorage.setItem('dv_cfg',JSON.stringify(CFG));}catch(e){}
+    cats=['Tất Cả',...CFG.cats]; cat='Tất Cả'; applyCfg(); render();
+  }
+}
+
+const DEF_CFG={name:"DuyuScript",title:"Nếu Script Game Nào Chưa Update Hoặc Lỗi Hãy Liên Hệ Admin",sub:"Lưu Ý Tìm Kiếm Hãy Ghi Tiếng Anh",yt:"https://www.youtube.com/",tt:"https://www.tiktok.com/",support:"Ủng hộ admin 1-2k iu lắm <3",avatar:"",fx:true,fxl:"strong",qr:"",qrText:"Quét mã QR để ủng hộ admin ❤",tracks:[{t:"Em Ơi Anh Phải Làm Sao",u:"https://www.youtube.com/embed/fTxjg5JYpi0?autoplay=1&loop=1&playlist=fTxjg5JYpi0"}],cats:["Attack On Titan Revolution","King Legacy","Tất Cả Script Game Câu Cá","99 Nights In The Forest","Throw Food For Animals"]};
+let CFG=Object.assign({},DEF_CFG,LS('dv_cfg')||{});
+function applyCfg(){
+  document.title=CFG.name;
+  document.getElementById('pName').textContent=CFG.name; document.getElementById('ftName').textContent=CFG.name;
+  document.getElementById('hTitle').textContent=CFG.title; document.getElementById('hSub').textContent=CFG.sub;
+  document.getElementById('ytBtn').href=CFG.yt; document.getElementById('ttBtn').href=CFG.tt;
+  if(CFG.avatar)document.getElementById('avImg').src=CFG.avatar;
+  document.getElementById('qrTop').hidden=!CFG.qr; if(CFG.qr)document.getElementById('qrImg').src=CFG.qr; document.getElementById('qrTxt').textContent=CFG.qrText;
+  applyTracks();
+}
+
+let SCRIPTS = [
+  {id: 1, hub:"Miranda Hub", game:"Steal An Egg", c:"Tất Cả", link:"https://link4m.org/YBKOl", subLink:"https://link4m.org/SUmNR", img:"https://i.ibb.co/jZVNHhLB/IMG-4726.jpg"},
+  {id: 2, hub:"Rift", game:"Climb For Animals Eggs", c:"Tất Cả", link:"https://link4m.net/esiNRzQm", subLink:"https://link4m.org/aM3vs5", img:"https://i.ibb.co/2Y8wSqpK/IMG-5037.jpg"},
+  {id: 3, hub:"N-Hook", game:"Solve The Cube", c:"Tất Cả", link:"https://link4m.net/8oqCO5sN", subLink:"https://link4m.org/fU173sY", img:"https://i.ibb.co/VpMX4kjS/IMG-5068.jpg"},
+  {id: 4, hub:"R Hub", game:"Ride A Pet", c:"Tất Cả", link:"https://link4m.net/Un5BcNem", subLink:"https://link4m.org/V6yRgx", img:"https://raw.githubusercontent.com/PainPH10/13-9/refs/heads/main/IMG_4155.jpeg"},
+  {id: 5, hub:"Sell Lemons", game:"", c:"Tất Cả", link:"https://link4m.org/z3UoA", subLink:"https://link4m.org/ig7XmH", img:"https://i.ibb.co/23gMZnfC/IMG-5049.jpg"},
+  {id: 6, hub:"Furmix Hub", game:"Bike For Egg", c:"Tất Cả", link:"https://link4m.net/uVa6MWY6", subLink:"https://link4m.org/5Ovxh", img:"https://i.ibb.co/wN6hS8hn/8-D6-ED3-EA-E99-B-405-F-BFC9-0-EC1-EF5-AA4-D2.jpg"},
+  {id: 7, hub:"Dek Dev Hub", game:"Break And Steal An Egg", c:"Tất Cả", link:"https://link4m.net/xgzeS", subLink:"https://link4m.org/oHTRXhim", img:"https://i.ibb.co/vCSbzGnf/IMG-5518.jpg"},
+  {id: 8, hub:"MorthUp", game:"", c:"Tất Cả", link:"https://link4m.org/7VuBc", subLink:"https://link4m.net/NoY94", img:"https://i.ibb.co/BVyhFWQK/IMG-4735.jpg"},
+  {id: 9, hub:"Pn Hub", game:"My Dino Life", c:"Tất Cả", link:"https://link4m.org/D6Y9qpO", subLink:"https://link4m.net/tarppnu", img:"https://i.ibb.co/tMYG0Xf7/IMG-5818.jpg"},
+  {id: 10, hub:"Jurassic Blocky", game:"", c:"Tất Cả", link:"https://fnote.net/notes/Nn2nNB", subLink:"https://fnote.net/notes/Nn2nNB", img:"https://i.ibb.co/tP8qzhg9/IMG-4737.jpg"},
+  {id: 11, hub:"KLZE Hub", game:"Attack On Titan Revolution", c:"Attack On Titan Revolution", link:"https://link4m.org/caYi66ts", subLink:"https://link4m.org/AfnPM", img:"https://i.ibb.co/X1wbBFk/IMG-5718.jpg"},
+  {id: 12, hub:"Jurassic Pixel", game:"", c:"Tất Cả", link:"https://link4m.net/3B7FeFyC", subLink:"https://link4m.org/GKszg1", img:"https://i.ibb.co/kgk80jgM/IMG-4738.jpg"},
+  {id: 13, hub:"TTJY Hub", game:"Creatures Of Sonaria", c:"Tất Cả", link:"https://link4m.net/bc8Hm", subLink:"https://link4m.net/4uaDRqgK", img:"https://i.ibb.co/HTCwPk3L/IMG-4743.jpg"},
+  {id: 14, hub:"RBXZ", game:"Prehistoric Farm", c:"Tất Cả", link:"https://link4m.org/18NdKed", subLink:"https://link4m.org/sLRN6Cm", img:"https://i.ibb.co/53xpNbR/IMG-4744.jpg"},
+  {id: 15, hub:"Strawbery Hub", game:"Primeval Earth", c:"Tất Cả", link:"https://link4m.org/OxbbiWX9", subLink:"https://link4m.net/pxSLU", img:"https://i.ibb.co/23SBpzB5/IMG-4756.jpg"},
+  {id: 16, hub:"Cybrion", game:"Deep Fishing", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.org/ckXNta", subLink:"https://link4m.org/y2JwMd", img:"https://i.ibb.co/pc6kh9R/IMG-5080.jpg"},
+  {id: 17, hub:"Adonis Hub", game:"Throw Food For Animals", c:"Throw Food For Animals", link:"https://link4m.net/Yrk52uf", subLink:"https://link4m.net/eIAd4hQZ", img:"https://i.ibb.co/zWjyNnhp/IMG-5993.jpg"},
+  {id: 18, hub:"Dueling Grounds", game:"", c:"Tất Cả", link:"https://link4m.net/mnmLtR9x", subLink:"https://link4m.net/rkMS3FO", img:"https://i.ibb.co/mCPQTwFt/IMG-4759.jpg"},
+  {id: 19, hub:"Ouroboros", game:"+1 Loot To Forge", c:"Tất Cả", link:"https://link4m.org/YckTOM4P", subLink:"https://link4m.org/VvuEClXp", img:"https://i.ibb.co/DnjQrsH/IMG-4745.jpg"},
+  {id: 20, hub:"AirFlow Hub", game:"Attack On Titan Revolution", c:"Attack On Titan Revolution", link:"https://link4m.org/meuoYA2Q", subLink:"https://link4m.org/zN918mz", img:"https://i.ibb.co/Ps0kCFGx/IMG-5804.jpg"},
+  {id: 21, hub:"Chnronix Hub", game:"Illegal Soccer", c:"Tất Cả", link:"https://link4m.org/PK04nNx", subLink:"https://link4m.net/bawtv1", img:"https://i.ibb.co/QFcT41tD/IMG-4746.jpg"},
+  {id: 22, hub:"Generic Hub", game:"Pixel Blade", c:"Tất Cả", link:"https://link4m.net/UF22p", subLink:"https://link4m.org/44QEFRSS", img:"https://i.ibb.co/B5BfkzkR/IMG-4747.jpg"},
+  {id: 23, hub:"StarCrow Hub", game:"Heavyweight Fishing", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.net/m90WUhbK", subLink:"https://link4m.net/T6Gcw", img:"https://i.ibb.co/Ps4J25BZ/IMG-4748.jpg"},
+  {id: 24, hub:"Anime Dice", game:"", c:"Tất Cả", link:"https://link4m.org/FxtMnM", subLink:"https://link4m.net/eZnl8", img:"https://i.ibb.co/YFvrbp5Y/IMG-4749.jpg"},
+  {id: 25, hub:"Dueling Grounds Mới", game:"", c:"Tất Cả", link:"https://link4m.org/I0Mms7e", subLink:"https://link4m.org/T3M6haE", img:"https://i.ibb.co/Jj8JWTGG/IMG-4750.jpg"},
+  {id: 26, hub:"Cybrion", game:"Heavyweight Fishing", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.net/reyQHYK", subLink:"https://link4m.org/Ok3iozab", img:"https://i.ibb.co/xtf1wrtc/IMG-4751.jpg"},
+  {id: 27, hub:"Barrage", game:"That Freekick Challenge", c:"Tất Cả", link:"https://link4m.org/srCUB", subLink:"https://link4m.net/YqiqPK", img:"https://i.ibb.co/k2Yk7t0j/IMG-4752.jpg"},
+  {id: 28, hub:"Pivot", game:"Tribes 3v3", c:"Tất Cả", link:"https://link4m.org/2ThUjT", subLink:"https://link4m.org/OzsCD", img:"https://i.ibb.co/0RKxkrFN/IMG-5216.jpg"},
+  {id: 29, hub:"AirFlow Hub", game:"Huss Valley", c:"Tất Cả", link:"https://link4m.org/tYQC7YhY", subLink:"https://link4m.org/9kuhvGL", img:"https://i.ibb.co/C3g61642/IMG-5125.jpg"},
+  {id: 30, hub:"Khfresh", game:"Heavyweight Fishing", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.net/fVZpeH", subLink:"https://link4m.net/En5iuml1", img:"https://i.ibb.co/KcgvqpM3/IMG-4754.jpg"},
+  {id: 31, hub:"Niah Hub", game:"Kaiju Alpha", c:"Tất Cả", link:"https://link4m.net/KeJbwBEK", subLink:"https://link4m.net/dy2wY", img:"https://i.ibb.co/9HqVWfKX/IMG-4762.jpg"},
+  {id: 32, hub:"RBXZ", game:"Fisch", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.org/KPOIIid", subLink:"https://link4m.org/dxUOW", img:"https://i.ibb.co/Y71yJ1FZ/IMG-5215.jpg"},
+  {id: 34, hub:"Barrage", game:"Solve The Cube", c:"Tất Cả", link:"https://link4m.org/5Mlcl", subLink:"https://link4m.net/IKlEd6hb", img:"https://i.ibb.co/DDPW6SBq/IMG-5069.jpg"},
+  {id: 35, hub:"Survival A Million Monkey", game:"", c:"Tất Cả", link:"https://link4m.org/ErGSJC", subLink:"https://link4m.net/WkaqNI", img:"https://i.ibb.co/DP5Lj5s0/IMG-4767.jpg"},
+  {id: 36, hub:"Dekdev", game:"Harpoon A Fish", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.net/nnuOTQ", subLink:"https://link4m.net/PGzFVr", img:"https://i.ibb.co/q8XCcWg/IMG-4768.jpg"},
+  {id: 37, hub:"Luks Hub", game:"Chop A Forest", c:"Tất Cả", link:"https://link4m.org/fLQg9Lo", subLink:"https://link4m.org/kwb1lit", img:"https://i.ibb.co/XxN6PDG4/IMG-4769.jpg"},
+  {id: 38, hub:"My Anime Mine", game:"", c:"Tất Cả", link:"https://link4m.org/FKak8So", subLink:"https://link4m.org/xSJm58", img:"https://i.ibb.co/5g4DGwp4/IMG-4770.jpg"},
+  {id: 39, hub:"AirFlow Hub", game:"Sell Fries", c:"Tất Cả", link:"https://link4m.net/dKI2bRv", subLink:"https://link4m.org/5OBeQ5Nu", img:"https://i.ibb.co/d46dj81Q/IMG-4771.jpg"},
+  {id: 40, hub:"Valinc Syndicate", game:"Evade", c:"Tất Cả", link:"https://link4m.net/1na23", subLink:"https://link4m.org/yPVOs", img:"https://i.ibb.co/HTVgwzzb/IMG-4772.jpg"},
+  {id: 41, hub:"Ride A Dino", game:"", c:"Tất Cả Script Khủng Long", link:"https://link4m.org/y2TPbX", subLink:"https://link4m.org/lIPok", img:"https://i.ibb.co/PZM3zmWL/IMG-4773.jpg"},
+  {id: 42, hub:"Foxname", game:"99 Nights in the Forest", c:"99 Nights In The Forest", link:"https://link4m.net/r6hLPeK", subLink:"https://link4m.org/VXmf8rGC", img:"https://i.ibb.co/svG0dQKy/IMG-5978.jpg"},
+  {id: 43, hub:"Stockfish", game:"Rochess", c:"Tất Cả", link:"https://link4m.org/hZPjOeU", subLink:"https://link4m.net/nFD46", img:"https://i.ibb.co/JWB55t04/IMG-5931.jpg"},
+  {id: 44, hub:"Tora Isme", game:"+1 Venom Evolution", c:"Tất Cả", link:"https://link4m.net/gaUog6ia", subLink:"https://link4m.net/xLwhJs8Z", img:"https://i.ibb.co/B2Q9BDhN/IMG-5549.jpg"},
+  {id: 45, hub:"Ringta", game:"99 Nights in the Forest", c:"99 Nights In The Forest", link:"https://link4m.org/VDzuM", subLink:"https://link4m.org/ejfWy", img:"https://i.ibb.co/HT7TdDVq/IMG-5849.jpg"},
+  {id: 46, hub:"RBXZ", game:"Deep Fishing", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.org/Qz027jc", subLink:"https://link4m.org/K7oH4", img:"https://i.ibb.co/gMzgqB6P/IMG-5103.jpg"},
+  {id: 47, hub:"Farm Sự Kiện", game:"Evade", c:"Tất Cả", link:"https://link4m.org/H9vIE71V", subLink:"https://link4m.net/H9vIE71V", img:"https://i.ibb.co/DHVGfXLJ/IMG-4778.jpg"},
+  {id: 48, hub:"Slopix Hub", game:"Ball Vs Ball", c:"Tất Cả", link:"https://link4m.org/K2imMty", subLink:"https://link4m.net/2SRqD", img:"https://i.ibb.co/KjpJBZdW/IMG-4780.jpg"},
+  {id: 49, hub:"Mario Hub", game:"Build An Ant Empire", c:"Tất Cả", link:"https://link4m.net/FpGcxQ", subLink:"https://link4m.net/3NLEF1", img:"https://i.ibb.co/wZGHQ0MM/IMG-4779.jpg"},
+  {id: 50, hub:"Mystrix Hub", game:"Climb For Animals Eggs", c:"Tất Cả", link:"https://link4m.org/c66ih", subLink:"https://link4m.net/tGX5xP", img:"https://i.ibb.co/G4Xwk4py/IMG-5038.jpg"},
+  {id: 51, hub:"Barrage", game:"+1 Pickaxe Swing For Egg", c:"Tất Cả", link:"https://link4m.org/ICdeG", subLink:"https://link4m.net/RAqJa", img:"https://i.ibb.co/qY620wW9/IMG-4798.jpg"},
+  {id: 33, hub:"Fake An Egg", game:"", c:"Tất Cả", link:"https://link4m.net/KUkvxxJn", subLink:"https://link4m.net/WzubxhjM", img:"https://i.ibb.co/4wjf4P9j/IMG-4811.jpg"},
+  {id: 52, hub:"Barrage", game:"8 Ball Duels", c:"Tất Cả", link:"https://link4m.net/L5rJICr", subLink:"https://link4m.net/yoPhp", img:"https://i.ibb.co/RkdJRvNG/IMG-4815.jpg"},
+  {id: 53, hub:"Mirage Hub", game:"Untitled Boxing Game", c:"Tất Cả", link:"https://link4m.net/8nGzS3", subLink:"https://link4m.org/oPSbcv", img:"https://i.ibb.co/nqYvvCkx/IMG-4836.jpg"},
+  {id: 54, hub:"Alexandria", game:"Be A Soccer Manager", c:"Tất Cả", link:"https://link4m.net/7P95T", subLink:"https://link4m.org/5GEeac", img:"https://i.ibb.co/SDyLr4Sz/IMG-5657.jpg"},
+  {id: 55, hub:"StarCrow", game:"Anime Ability Arena", c:"Tất Cả", link:"https://link4m.net/0hfqZt65", subLink:"https://link4m.org/VHkQs0", img:"https://i.ibb.co/gLBc2shY/IMG-4939.jpg"},
+  {id: 56, hub:"Jujutsu Shenanigans", game:"", c:"Tất Cả", link:"https://link4m.net/1EoT5IQz", subLink:"https://link4m.net/2RiQq2X", img:"https://i.ibb.co/DPfCtBH6/IMG-5102.jpg"},
+  {id: 57, hub:"Ajjans", game:"Break And Steal An Egg", c:"Tất Cả", link:"https://link4m.net/Fv5Jt", subLink:"https://link4m.org/YEmFuJ0", img:"https://i.ibb.co/cS97rfPk/IMG-4967.jpg"},
+  {id: 58, hub:"Barrage", game:"Backseat Rally", c:"Tất Cả", link:"https://link4m.net/obvNS", subLink:"https://link4m.org/kmLahP", img:"https://i.ibb.co/XfxBLrv5/IMG-4943.jpg"},
+  {id: 59, hub:"MeritHub", game:"Skywars", c:"Tất Cả", link:"https://link4m.org/xqo9OR", subLink:"https://link4m.net/ZncpE", img:"https://i.ibb.co/HDxJ3Jyv/IMG-5200.jpg"},
+  {id: 60, hub:"RBXZ", game:"Bike Universe", c:"Tất Cả", link:"https://link4m.org/z3xb9", subLink:"https://link4m.net/hGBeM4L", img:"https://i.ibb.co/XrcH2LmV/IMG-5405.jpg"},
+  {id: 61, hub:"Corvus", game:"Blue Lock Farm", c:"Tất Cả", link:"https://link4m.net/dMFPf8RA", subLink:"https://link4m.org/sMuAg", img:"https://i.ibb.co/6J4q2vWg/IMG-5268.jpg"},
+  {id: 62, hub:"ddariuspr", game:"Dont Splash", c:"Tất Cả", link:"https://link4m.net/2m9Z0", subLink:"https://link4m.org/sMuAg", img:"https://i.ibb.co/FbRzJVyW/IMG-5306.jpg"},
+  {id: 63, hub:"Mystrix", game:"Throw Food For Animals", c:"Throw Food For Animals", link:"https://link4m.net/dxWEhDN", subLink:"https://link4m.org/mryYilX", img:"https://i.ibb.co/KjwWTLKr/IMG-5347.jpg"},
+  {id: 64, hub:"Mystrix", game:"Bike For Egg", c:"Tất Cả", link:"https://link4m.org/G3Sf6Z", subLink:"https://link4m.net/iOS5Y3", img:"https://i.ibb.co/HT34cDfz/IMG-5355.jpg"},
+  {id: 65, hub:"Steal A Pet And Ride It", game:"", c:"Tất Cả", link:"https://link4m.org/qSOsOin", subLink:"https://link4m.org/JQ4WL", img:"https://i.ibb.co/v4jKHNmK/IMG-5369.jpg"},
+  {id: 66, hub:"UB Hub", game:"Fisch", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.org/KOVmOqu", subLink:"https://link4m.org/cZ7jLaD", img:"https://i.ibb.co/fd68gw4Z/IMG-5394.jpg"},
+  {id: 67, hub:"Mystrix", game:"Bike Universe", c:"Tất Cả", link:"https://link4m.org/WNIAYt", subLink:"https://link4m.org/LFL0cpVc", img:"https://i.ibb.co/jZ8FtnZ4/IMG-5406.jpg"},
+  {id: 68, hub:"Sottoro", game:"Attack On Titan Revolution", c:"Attack On Titan Revolution", link:"https://link4m.net/en2eMK", subLink:"https://link4m.net/3o4G8uW3", img:"https://i.ibb.co/M5B82P4N/IMG-5433.jpg"},
+  {id: 69, hub:"Barrage", game:"Ride Storm", c:"Tất Cả", link:"https://link4m.org/DOjFPf4Q", subLink:"https://link4m.org/vrO0Z70", img:"https://i.ibb.co/G4Hw0pWF/IMG-5444.jpg"},
+  {id: 70, hub:"RobScript", game:"Fake An Egg", c:"Tất Cả", link:"https://link4m.net/zFaHiQ", subLink:"https://link4m.net/DszvWI", img:"https://i.ibb.co/pjq2vhYd/IMG-5468.jpg"},
+  {id: 71, hub:"Smooth Hub", game:"Attack On Titan Revolution", c:"Attack On Titan Revolution", link:"https://link4m.net/CUZCO4BP", subLink:"https://link4m.net/pdoJkrcd", img:"https://i.ibb.co/s951gJPK/IMG-5484.jpg"},
+  {id: 72, hub:"AKkiwi", game:"Steal A Pet An Ride It", c:"Tất Cả", link:"https://link4m.net/lFgZDQP", subLink:"https://link4m.org/X6rNLNiG", img:"https://i.ibb.co/nNf7YQmW/IMG-5499.jpg"},
+  {id: 73, hub:"Zynex Hub", game:"Fish It", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.net/PIuVhn", subLink:"https://link4m.net/sNFo5", img:"https://i.ibb.co/BVjbV2f0/IMG-5526.jpg"},
+  {id: 74, hub:"Helio Hub", game:"Storage Hunters Open World", c:"Tất Cả", link:"https://link4m.org/wTDXVc6", subLink:"https://link4m.org/boTdU", img:"https://i.ibb.co/HTDTKvpb/IMG-5596.jpg"},
+  {id: 75, hub:"Axon Hub", game:"Attack On Titan Revolution", c:"Attack On Titan Revolution", link:"https://link4m.org/Xiech", subLink:"https://link4m.net/VAMvd", img:"https://i.ibb.co/RTKZCvQ1/IMG-5622.jpg"},
+  {id: 76, hub:"Tora Isme", game:"+1 Anime Eyes", c:"Tất Cả", link:"https://link4m.org/IERXjGZA", subLink:"https://link4m.net/2huOvlDP", img:"https://i.ibb.co/F48s7D5F/IMG-5633.jpg"},
+  {id: 77, hub:"Solo Hub", game:"Attack On Titan Revolution", c:"Attack On Titan Revolution", link:"https://link4m.net/8w35Pq7Y", subLink:"https://link4m.net/9aoUi", img:"https://i.ibb.co/vxnpD4vK/IMG-5645.jpg"},
+  {id: 78, hub:"Rs Hub", game:"RoWorld", c:"Tất Cả", link:"https://link4m.org/izCSJxdb", subLink:"https://link4m.net/fKb5EU7", img:"https://i.ibb.co/nqHLhxXh/IMG-5683.jpg"},
+  {id: 79, hub:"MultiHub Pro", game:"Bug Evolution", c:"Tất Cả", link:"https://link4m.net/f5EHtDVa", subLink:"https://link4m.net/rRZee5t", img:"https://i.ibb.co/dw40W4nj/IMG-5701.jpg"},
+  {id: 80, hub:"Rayfield", game:"Primeval Earth", c:"Tất Cả", link:"https://link4m.net/vWVdnl", subLink:"https://link4m.org/QsjNSy", img:"https://i.ibb.co/tTM6ZsTT/IMG-4739.jpg"},
+  {id: 81, hub:"Nobulem.wtf", game:"Attack On Titan Revolution", c:"Attack On Titan Revolution", link:"https://link4m.org/89SC9Hg", subLink:"https://link4m.net/Ceiug", img:"https://i.ibb.co/XrgrJWmK/IMG-5584.jpg"},
+  {id: 82, hub:"Akkiwi", game:"Throw Food For Animals", c:"Throw Food For Animals", link:"https://link4m.org/LFCrC1", subLink:"https://link4m.net/L4rUZws", img:"https://i.ibb.co/VnsdkB3/IMG-5740.jpg"},
+  {id: 83, hub:"Tora Isme", game:"Survive Your Ideas", c:"Tất Cả", link:"https://link4m.org/v5Nln", subLink:"https://link4m.net/k2u0heop", img:"https://i.ibb.co/LzMphxvf/IMG-5777.jpg"},
+  {id: 84, hub:"Axon Hub", game:"King Legacy", c:"King Legacy", link:"https://link4m.net/O5QrVUeW", subLink:"https://link4m.org/hFoaz", img:"https://i.ibb.co/h1XQc9tc/IMG-5885.jpg"},
+  {id: 85, hub:"Zee Hub", game:"King Legacy", c:"King Legacy", link:"https://link4m.org/ETovap", subLink:"https://link4m.net/QJhci", img:"https://i.ibb.co/prZcj2Hj/IMG-5884.jpg"},
+  {id: 86, hub:"Wukong Hub", game:"King Legacy", c:"King Legacy", link:"https://link4m.net/8njS5", subLink:"https://link4m.org/aeZoVyK", img:"https://i.ibb.co/21JhG6x5/IMG-5944.jpg"},
+  {id: 87, hub:"Xeioa", game:"Throw Food For Animals", c:"Throw Food For Animals", link:"https://link4m.net/UIupWBl", subLink:"https://link4m.net/yUArx", img:"https://i.ibb.co/r2ysfvMC/IMG-5954.jpg"},
+  {id: 88, hub:"Yuri", game:"Throw A Seed", c:"Tất Cả", link:"https://link4m.org/mQHNf", subLink:"https://link4m.net/BDOo3R", img:"https://i.ibb.co/m59CCSYX/IMG-6016.jpg"},
+  {id: 89, hub:"LNR Hub", game:"Fisch", c:"Tất Cả Script Game Câu Cá", link:"https://link4m.org/mjE9a", subLink:"https://link4m.org/GTqn2z", img:"https://i.ibb.co/mVdsb7Y0/IMG-6024.jpg"},
+  {id: 90, hub:"Adonis Hub", game:"Throw A Seed", c:"Tất Cả", link:"https://link4m.net/wci8W", subLink:"https://link4m.org/WFpBgDt", img:"https://i.ibb.co/1tZd1Bwf/IMG-6045.jpg"},
+  {id: 91, hub:"RBXZ", game:"Driving Empire", c:"Tất Cả", link:"https://link4m.org/pkZUH", subLink:"https://link4m.net/tpsHCK", img:"https://i.ibb.co/4ZdZN8R8/IMG-6082.jpg"},
+  {id: 92, hub:"Spectrum", game:"King Legacy", c:"King Legacy", link:"https://link4m.org/JY0aofuB", subLink:"https://link4m.net/IKHCwc", img:"https://i.ibb.co/fYwhGFht/IMG-6114.jpg"},
+  {id: 93, hub:"DYXNET Hub", game:"Paper To Plane", c:"Tất Cả", link:"https://link4m.org/p1t6VWzc", subLink:"https://link4m.net/3MsJjKp", img:"https://i.ibb.co/Ld0t5kpq/IMG-6134.jpg"},
+  {id: 94, hub:"Core. Xyz", game:"99 Nights in the Forest", c:"99 Nights In The Forest", link:"https://link4m.net/Jrz5XJyJ", subLink:"https://link4m.net/PVk25UF0", img:"https://i.ibb.co/Z60HNPFT/IMG-6150.jpg"},
+  {id: 95, hub:"MoonDiety", game:"Throw Food For Animals", c:"Throw Food For Animals", link:"https://link4m.net/9uFD2k", subLink:"https://link4m.net/J4Rgik7", img:"https://i.ibb.co/Gf6j1y4p/IMG-6156.jpg"},
+  {id: 97, hub:"Lumin Hub", game:"King Legacy", c:"King Legacy", link:"https://link4m.net/jbOYl4K", subLink:"https://4note.net/dlrjgvkuca", img:"https://i.ibb.co/HfkP3R9W/IMG-6169.jpg"},
+  {id: 96, hub:"Cryonix", game:"Attack On Titan Revolution", c:"Attack On Titan Revolution", link:"https://link4m.net/p9xBgX", subLink:"https://link4m.net/oWjnqFO9", img:"https://i.ibb.co/TqnCj1c7/IMG-5899.jpg"}
+];
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+{const o=LS('dv_scripts'); if(Array.isArray(o)) SCRIPTS=o;}
+shuffle(SCRIPTS);
+
+const dotColors = ['#ff4fa3', '#a855f7', '#38bdf8', '#ffca3a'];
+const $ = id => document.getElementById(id);
+let cat = 'Tất Cả';
+let currentPage = 1;
+const ITEMS_PER_PAGE = 20;
+let cats = ['Tất Cả', ...CFG.cats];
+
+/* ============ Fast image pipeline ============ */
+let imgObserver;
+if (typeof IntersectionObserver !== 'undefined') {
+  imgObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (!entry.isIntersecting) continue;
+      const img = entry.target;
+      const url = img.dataset.src;
+      if (url && !img.src) {
+        img.src = url;
+        img.onload = () => {
+          img.classList.add('img-ready');
+          const box = img.closest('.card-img-box');
+          if (box) box.classList.add('loaded');
+        };
+        img.onerror = () => {
+          const box = img.closest('.card-img-box');
+          if (box) box.classList.add('loaded');
+        };
+      }
+      imgObserver.unobserve(img);
+    }
+  }, { rootMargin: '600px 0px', threshold: 0.01 });
+} else {
+  imgObserver = {
+    observe: (img) => {
+      const url = img.dataset.src;
+      if (url && !img.src) {
+        img.src = url;
+        img.onload = () => {
+          img.classList.add('img-ready');
+          const box = img.closest('.card-img-box');
+          if (box) box.classList.add('loaded');
+        };
+        img.onerror = () => {
+          const box = img.closest('.card-img-box');
+          if (box) box.classList.add('loaded');
+        };
+      }
+    },
+    unobserve: () => {}
+  };
+}
+
+function primeFirstImages(count = 4) {
+  const imgs = [...document.querySelectorAll('.card-img-box img[data-src]')].slice(0, count);
+  imgs.forEach(img => {
+    const url = img.dataset.src;
+    if (!url) return;
+    img.fetchPriority = 'high';
+    img.removeAttribute('loading');
+    img.src = url;
+    img.onload = () => {
+      img.classList.add('img-ready');
+      const box = img.closest('.card-img-box');
+      if (box) box.classList.add('loaded');
+    };
+    img.onerror = () => {
+      const box = img.closest('.card-img-box');
+      if (box) box.classList.add('loaded');
+    };
+    imgObserver.unobserve(img);
+  });
+}
+
+/* ============ Render ============ */
+function render(){
+  const q = $('q').value.trim().toLowerCase();
+
+  const filtered = SCRIPTS.filter(s =>
+    (cat === 'Tất Cả' || s.c === cat) &&
+    (!q || s.hub.toLowerCase().includes(q) || s.game.toLowerCase().includes(q))
+  );
+
+  const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+
+  const start = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginated = filtered.slice(start, start + ITEMS_PER_PAGE);
+
+  $('tags').innerHTML = cats.map((c, i) => `
+    <button class="${c === cat ? 'on' : ''}" onclick="changeCat('${c.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">
+      <span class="dot" style="background:${dotColors[i % dotColors.length]}"></span>
+      <span>${c}</span>
+    </button>
+  `).join('');
+
+  $('list').innerHTML = paginated.map(s => `
+    <div class="card">
+      <div class="card-img-box">
+        ${s.img
+          ? `<img data-src="${fastCDN(s.img)}" alt="${s.hub}" decoding="async" loading="lazy" fetchpriority="low" width="640" height="360">`
+          : `<div class="card-img-placeholder">SCRIPT ${s.c.toUpperCase()}</div>`}
+      </div>
+      <div class="card-body">
+        <h2 class="card-title">
+          ${s.hub} ${s.game ? `<span class="game-name">${s.game}</span>` : ''}
+        </h2>
+        <div class="card-footer">
+          <a class="btn-link" href="${s.link}" target="_blank" rel="noopener">LINK CHÍNH</a>
+          <a class="btn-link btn-sub" href="${s.subLink}" target="_blank" rel="noopener">LINK PHỤ</a>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.querySelectorAll('.card-img-box img[data-src]').forEach(img => imgObserver.observe(img));
+  primeFirstImages(4);
+
+  let pageButtons = '';
+  if (totalPages > 1) {
+    pageButtons += `<button ${currentPage === 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">&larr; Trước</button>`;
+    for (let p = 1; p <= totalPages; p++) {
+      pageButtons += `<button class="${p === currentPage ? 'active' : ''}" onclick="changePage(${p})">${p}</button>`;
+    }
+    pageButtons += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">Sau &rarr;</button>`;
+  }
+  $('pagination').innerHTML = pageButtons;
+}
+
+function changeCat(c) { cat = c; currentPage = 1; render(); hideSuggestions(); }
+function changePage(p) { currentPage = p; render(); window.scrollTo({ top: 300, behavior: 'smooth' }); }
+
+/* ============ Suggestions (autocomplete) ============ */
+const inputEl = $('q');
+const sugBox  = $('suggestions');
+let sugItems = [];
+let sugActiveIdx = -1;
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function hideSuggestions() {
+  sugBox.classList.remove('show');
+  sugBox.innerHTML = '';
+  sugItems = [];
+  sugActiveIdx = -1;
+}
+
+function showSuggestions(query) {
+  const q = query.trim().toLowerCase();
+  if (!q) { hideSuggestions(); return; }
+
+  const gameSet = new Set();
+  const hubSet  = new Set();
+  SCRIPTS.forEach(s => {
+    if (s.game && s.game.toLowerCase().includes(q)) gameSet.add(s.game);
+    if (s.hub  && s.hub.toLowerCase().includes(q))  hubSet.add(s.hub);
+  });
+
+  sugItems = [
+    ...[...gameSet].slice(0, 6).map(v => ({ type: 'Game', label: v })),
+    ...[...hubSet ].slice(0, 6).map(v => ({ type: 'Hub',  label: v })),
+  ];
+  sugActiveIdx = -1;
+
+  if (!sugItems.length) {
+    sugBox.innerHTML = `<div class="sug-empty">Không có gợi ý — thử từ khóa khác</div>`;
+    sugBox.classList.add('show');
+    return;
+  }
+
+  sugBox.innerHTML = sugItems.map((it, i) => `
+    <div class="sug-item" data-idx="${i}">
+      <span class="sug-label">${esc(it.label)}</span>
+    </div>
+  `).join('');
+  sugBox.classList.add('show');
+
+  sugBox.querySelectorAll('.sug-item').forEach(el => {
+    el.addEventListener('click', () => pickSuggestion(Number(el.dataset.idx)));
+  });
+}
+
+function pickSuggestion(idx) {
+  const it = sugItems[idx];
+  if (!it) return;
+  inputEl.value = it.label;
+  cat = 'Tất Cả';
+  currentPage = 1;
+  render();
+  hideSuggestions();
+  inputEl.blur();
+}
+
+function highlightSuggestion(newIdx) {
+  const nodes = sugBox.querySelectorAll('.sug-item');
+  if (!nodes.length) return;
+  sugActiveIdx = (newIdx + nodes.length) % nodes.length;
+  nodes.forEach((n, i) => n.classList.toggle('active', i === sugActiveIdx));
+  nodes[sugActiveIdx].scrollIntoView({ block: 'nearest' });
+}
+
+let renderTimeout;
+inputEl.addEventListener('input', () => {
+  if (inputEl.value.trim() !== '') cat = 'Tất Cả';
+  currentPage = 1;
+  clearTimeout(renderTimeout);
+  renderTimeout = setTimeout(render, 150);
+  showSuggestions(inputEl.value);
+});
+
+inputEl.addEventListener('keydown', (e) => {
+  if (!sugBox.classList.contains('show')) {
+    if (e.key === 'Enter' && inputEl.value.trim() !== '') {
+      cat = 'Tất Cả'; currentPage = 1; render();
+    }
+    return;
+  }
+  if (e.key === 'ArrowDown') { e.preventDefault(); highlightSuggestion(sugActiveIdx + 1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); highlightSuggestion(sugActiveIdx - 1); }
+  else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (sugActiveIdx >= 0) pickSuggestion(sugActiveIdx);
+    else { if (inputEl.value.trim() !== '') { cat = 'Tất Cả'; currentPage = 1; render(); } hideSuggestions(); }
+  } else if (e.key === 'Escape') {
+    hideSuggestions();
+  }
+});
+
+$('go').addEventListener('click', () => {
+  if (inputEl.value.trim() !== '') cat = 'Tất Cả';
+  currentPage = 1;
+  render();
+  hideSuggestions();
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.search-wrap')) hideSuggestions();
+});
+
+applyCfg();
+render();
+</script>
+
+
+
+<div id="adm" role="dialog" aria-modal="true" aria-label="Admin Panel"></div>
+<script>
+/* ============ ADMIN PANEL ============ */
+const DEF_HASH='46031cdc405ee29764e1f9e4aef70047fe84de3b76298e15519a2593525ca57c';
+const A=$('adm');
+async function H(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('DuyuScript:'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+const curHash=()=>localStorage.getItem('dv_pw')||DEF_HASH;
+let tab='dash',fq='',ed=null,fails=0,lock=0;
+const TABS={dash:'📊 Tổng quan',scr:'🎮 Script',cat:'🏷️ Danh mục',set:'⚙️ Cài đặt web',mus:'🎵 Nhạc',bak:'💾 Sao lưu & Xuất bản',sec:'🔒 Bảo mật'};
+function toast(t){const o=document.getElementById('aToast');if(o)o.remove();const d=document.createElement('div');d.id='aToast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
+function closeA(){A.className='';A.innerHTML='';document.body.style.overflow='';if(location.hash==='#admin')history.replaceState(null,'',location.pathname+location.search)}
+function openLogin(){
+  if(sessionStorage.getItem('dv_ok')==='1')return openPanel();
+  A.className='on';document.body.style.overflow='hidden';
+  A.innerHTML=`<form class="a-box a-login" id="aLf" autocomplete="off"><h2>🔐 Admin ${esc(CFG.name)}</h2><p>Đăng nhập tài khoản quản trị Supabase</p>
+  <div class="a-f"><input id="aEmail" type="email" placeholder="Email admin" aria-label="Email admin" autocomplete="username" required></div>
+  <div class="a-f"><input id="aPw" type="password" placeholder="Mật khẩu" aria-label="Mật khẩu" autocomplete="current-password" required></div>
+  <div id="aErr" style="color:#e63946;font-size:13px;min-height:18px;margin-bottom:8px"></div>
+  <button class="a-btn" style="width:100%">Đăng nhập</button><button type="button" class="a-btn g" style="width:100%;margin-top:8px" data-a="close">Đóng</button></form>`;
+  $('aEmail').focus();
+  $('aLf').onsubmit=async e=>{e.preventDefault();const box=$('aLf'),err=$('aErr');
+    if(!sb){err.textContent='Chưa cấu hình SUPABASE_URL và SUPABASE_ANON_KEY trong file index.html.';return}
+    if(Date.now()<lock){err.textContent='Thử sai quá nhiều. Đợi '+Math.ceil((lock-Date.now())/1000)+'s';return}
+    const enteredEmail=$('aEmail').value.trim().toLowerCase();
+    if(enteredEmail!==ADMIN_EMAIL.toLowerCase()){err.textContent='Tài khoản này không được cấp quyền quản trị.';return}
+    const {data,error}=await sb.auth.signInWithPassword({email:enteredEmail,password:$('aPw').value});
+    if(!error && data.session && (data.user?.email||'').toLowerCase()===ADMIN_EMAIL.toLowerCase()){
+      fails=0;sessionStorage.setItem('dv_ok','1');await sbLoadPromise;
+      if(!sbHasRemoteData)scheduleCloudSync();
+      openPanel()
+    } else {
+      if(data.session) await sb.auth.signOut();
+      if(++fails>=5){lock=Date.now()+60000;fails=0}
+      err.textContent='Email hoặc mật khẩu không đúng';box.classList.remove('err');void box.offsetWidth;box.classList.add('err');$('aPw').select()
+    }}
+}
+function openPanel(){A.className='on';document.body.style.overflow='hidden';panel()}
+function panel(){
+  A.innerHTML=`<div class="a-wrap"><nav class="a-box a-side"><b>⚙ Admin</b>${Object.entries(TABS).map(([k,v])=>`<button data-a="tab" data-i="${k}" class="${k===tab?'on':''}">${v}</button>`).join('')}
+  <button data-a="view">🌐 Xem website</button><button data-a="out">🚪 Đăng xuất</button></nav><section class="a-box a-main" id="aBody">${V[tab]()}</section></div>`;
+}
+const inp=(id,l,v,t)=>`<div class="a-f"><label for="${id}">${l}</label><input id="${id}" type="${t||'text'}" value="${esc(v||'')}"></div>`;
+const V={
+dash(){const n=SCRIPTS.length,noImg=SCRIPTS.filter(s=>!s.img).length,cnt={};SCRIPTS.forEach(s=>cnt[s.c]=(cnt[s.c]||0)+1);
+  const mx=Math.max(1,...Object.values(cnt)),last=SCRIPTS.slice().sort((a,b)=>b.id-a.id).slice(0,5);
+  return `<h2>Tổng quan</h2><div class="a-stats"><div class="a-stat"><i>${n}</i><span>Script</span></div><div class="a-stat"><i>${CFG.cats.length}</i><span>Danh mục</span></div><div class="a-stat"><i>${new Set(SCRIPTS.map(s=>s.hub)).size}</i><span>Hub</span></div><div class="a-stat"><i>${noImg}</i><span>Thiếu ảnh</span></div></div>
+  <h3>Theo danh mục</h3>${Object.entries(cnt).map(([k,v])=>`<div class="a-bar"><em>${esc(k)}</em><div style="width:${v/mx*55}%"></div><b>${v}</b></div>`).join('')}
+  <h3>Mới thêm</h3>${last.map(s=>`<div class="a-bar"><em>${esc(s.hub)}</em><span>${esc(s.game)}</span></div>`).join('')}`},
+scr(){const l=SCRIPTS.filter(s=>!fq||(s.hub+' '+s.game).toLowerCase().includes(fq.toLowerCase())).slice().sort((a,b)=>b.id-a.id);
+  const f=ed?`<div class="a-form"><h3 style="margin-top:0">${ed.id?'Sửa script #'+ed.id:'Thêm script mới'}</h3><div class="a-row">${inp('fHub','Tên Hub',ed.hub)}${inp('fGame','Tên Game',ed.game)}</div>
+  <div class="a-f"><label for="fC">Danh mục</label><select id="fC">${['Tất Cả',...CFG.cats].map(c=>`<option ${c===ed.c?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
+  <div class="a-row">${inp('fL','Link chính',ed.link)}${inp('fS','Link phụ',ed.subLink)}</div>${inp('fI','Link ảnh (không bắt buộc)',ed.img)}
+  <button class="a-btn" data-a="save">Lưu</button> <button class="a-btn g" data-a="cancel">Huỷ</button></div>`:'';
+  return `<div class="a-top"><h2>Quản lý Script (${SCRIPTS.length})</h2><button class="a-btn" data-a="new">+ Thêm</button></div>${f}<div class="a-tb"><input id="aQ" placeholder="Tìm hub / game..." value="${esc(fq)}" aria-label="Tìm script"></div>
+  <div style="overflow-x:auto"><table class="a-tbl">${l.map(s=>`<tr><td>${s.img?`<img loading="lazy" src="${esc(fastCDN(s.img))}" alt="">`:'<img alt="">'}</td><td><b>${esc(s.hub)}</b><br><small>${esc(s.game)} · ${esc(s.c)}</small></td><td class="a-acts"><button class="a-btn s g" data-a="edit" data-i="${s.id}">Sửa</button><button class="a-btn s r" data-a="del" data-i="${s.id}">Xoá</button></td></tr>`).join('')}</table></div>`},
+cat(){return `<h2>Danh mục</h2><div class="a-tb"><input id="cNew" placeholder="Tên danh mục mới" aria-label="Danh mục mới"><button class="a-btn" data-a="cadd">+ Thêm</button></div>
+  <table class="a-tbl">${CFG.cats.map((c,i)=>`<tr><td><b>${esc(c)}</b><br><small>${SCRIPTS.filter(s=>s.c===c).length} script</small></td><td class="a-acts"><button class="a-btn s g" data-a="cren" data-i="${i}">Đổi tên</button><button class="a-btn s r" data-a="cdel" data-i="${i}">Xoá</button></td></tr>`).join('')}</table>`},
+set(){return `<h2>Cài đặt website</h2>${inp('sName','Tên thương hiệu',CFG.name)}${inp('sTitle','Tiêu đề lớn',CFG.title)}${inp('sSub','Dòng phụ',CFG.sub)}<div class="a-row">${inp('sYt','Link YouTube',CFG.yt)}${inp('sTt','Link TikTok',CFG.tt)}</div>
+  ${inp('sAv','Link ảnh avatar (để trống = mặc định)',CFG.avatar)}${inp('sQr','Link ảnh QR donate (hiện trên cùng trang; để trống = ẩn)',CFG.qr)}<div class="a-f"><label for="sQrF">…hoặc tải ảnh QR từ máy</label><input id="sQrF" type="file" accept="image/*"></div>${inp('sQrT','Chữ dưới mã QR',CFG.qrText)}<div class="a-f"><label for="sFx">Hiệu ứng động</label><select id="sFx"><option value="strong" ${(CFG.fx===false?'off':(CFG.fxl||'strong'))==='strong'?'selected':''}>Mạnh (nổi bật)</option><option value="soft" ${(CFG.fx===false?'off':(CFG.fxl||'strong'))==='soft'?'selected':''}>Nhẹ</option><option value="off" ${CFG.fx===false?'selected':''}>Tắt</option></select></div><button class="a-btn" data-a="sset">Lưu cài đặt</button>`},
+bak(){return `<h2>Sao lưu & Xuất bản</h2><div class="a-note">Khi đã cấu hình Supabase, mọi thay đổi được đồng bộ lên máy chủ và hiển thị cho tất cả khách truy cập. Bạn vẫn có thể tải data.json để sao lưu ngoại tuyến.</div>
+  <p><button class="a-btn" data-a="exp">⬇ Tải data.json</button> <button class="a-btn g" data-a="imp">⬆ Nhập data.json</button> <button class="a-btn r" data-a="rst">Khôi phục mặc định</button></p><input type="file" id="aFile" accept=".json" hidden>`},
+mus(){const T=CFG.tracks||[];return `<h2>Nhạc nền (${T.length})</h2><div class="a-note">Hỗ trợ <b>link YouTube</b> (youtube.com, youtu.be, shorts) và <b>link mp3 trực tiếp</b> (https://…/bai.mp3, hoặc ./bai.mp3 nếu để file cạnh index.html). Link Google Drive/Dropbox thường không phát được. Khách bấm nút ⏭ trên trình phát để chuyển bài.</div>
+  <div class="a-form"><div class="a-row">${inp('mT','Tên bài','')}${inp('mU','Link YouTube hoặc mp3','')}</div><button class="a-btn" data-a="madd">+ Thêm bài</button></div>
+  <table class="a-tbl">${T.map((t,i)=>`<tr><td><b>${esc(t.t)}</b><br><small>${ytId(t.u)?'YouTube':'MP3'} · ${esc(t.u)}</small></td><td class="a-acts"><button class="a-btn s g" data-a="mup" data-i="${i}" aria-label="Lên">↑</button><button class="a-btn s g" data-a="mdn" data-i="${i}" aria-label="Xuống">↓</button><button class="a-btn s r" data-a="mdel" data-i="${i}">Xoá</button></td></tr>`).join('')}</table>`},
+sec(){return `<h2>Bảo mật tài khoản</h2>${inp('pNew','Mật khẩu Supabase mới (từ 8 ký tự)','','password')}<button class="a-btn" data-a="pw">Cập nhật mật khẩu</button>
+  <div class="a-note">Đăng nhập được xác thực bởi Supabase Auth. Chỉ tài khoản Admin được cấp quyền trong chính sách RLS mới có thể ghi dữ liệu. Không bật đăng ký công khai.</div>`}};
+const val=id=>$(id).value.trim(), sameOrigin=u=>/^https?:\/\//i.test(u);
+function mSave(){SV('dv_cfg',CFG);applyCfg();panel();toast('Đã lưu')}
+const ACT={
+ madd(){const t=val('mT'),u=val('mU');if(!u)return toast('Nhập link nhạc');if(!ytId(u)&&!/^(https?:\/\/|\.\/)/i.test(u))return toast('Link phải là YouTube hoặc mp3 (http/https hoặc ./)');(CFG.tracks=CFG.tracks||[]).push({t:t||(ytId(u)?'Nhạc YouTube':'Nhạc nền'),u});mSave()},
+ mdel(i){CFG.tracks.splice(i,1);mSave()},
+ mup(i){i=+i;const T=CFG.tracks;if(i<1)return;[T[i-1],T[i]]=[T[i],T[i-1]];mSave()},
+ mdn(i){i=+i;const T=CFG.tracks;if(i>=T.length-1)return;[T[i+1],T[i]]=[T[i],T[i+1]];mSave()},
+ close:closeA,tab(i){tab=i;ed=null;panel()},view:closeA,async out(){sessionStorage.removeItem('dv_ok');if(sb)await sb.auth.signOut();closeA()},
+ new(){ed={hub:'',game:'',c:'Tất Cả',link:'',subLink:'',img:''};panel()},cancel(){ed=null;panel()},
+ edit(i){ed=Object.assign({},SCRIPTS.find(s=>s.id==i));panel()},
+ del(i){if(!confirm('Xoá script này?'))return;SCRIPTS=SCRIPTS.filter(s=>s.id!=i);SV('dv_scripts',SCRIPTS);render();panel();toast('Đã xoá')},
+ save(){const o={id:ed.id||Math.max(0,...SCRIPTS.map(s=>s.id))+1,hub:val('fHub'),game:val('fGame'),c:$('fC').value,link:val('fL'),subLink:val('fS'),img:val('fI')};
+  if(!o.hub)return toast('Cần nhập tên Hub');if(!sameOrigin(o.link)||(o.subLink&&!sameOrigin(o.subLink)))return toast('Link phải bắt đầu bằng http(s)://');
+  if(!o.subLink)o.subLink=o.link;const i=SCRIPTS.findIndex(s=>s.id===o.id);i<0?SCRIPTS.unshift(o):SCRIPTS[i]=o;ed=null;SV('dv_scripts',SCRIPTS);render();panel();toast('Đã lưu')},
+ cadd(){const v=val('cNew');if(!v||v==='Tất Cả'||CFG.cats.includes(v))return toast('Tên không hợp lệ hoặc đã có');CFG.cats.push(v);SV('dv_cfg',CFG);cats=['Tất Cả',...CFG.cats];render();panel()},
+ cren(i){const o=CFG.cats[i],n=(prompt('Tên mới:',o)||'').trim();if(!n||n===o||CFG.cats.includes(n))return;SCRIPTS.forEach(s=>{if(s.c===o)s.c=n});CFG.cats[i]=n;SV('dv_scripts',SCRIPTS);SV('dv_cfg',CFG);cats=['Tất Cả',...CFG.cats];cat='Tất Cả';render();panel()},
+ cdel(i){const o=CFG.cats[i];if(!confirm('Xoá danh mục "'+o+'"? Script bên trong chuyển về "Tất Cả".'))return;SCRIPTS.forEach(s=>{if(s.c===o)s.c='Tất Cả'});CFG.cats.splice(i,1);SV('dv_scripts',SCRIPTS);SV('dv_cfg',CFG);cats=['Tất Cả',...CFG.cats];cat='Tất Cả';render();panel()},
+ sset(){Object.assign(CFG,{name:val('sName')||'DuyuScript',title:val('sTitle'),sub:val('sSub'),yt:val('sYt'),tt:val('sTt'),avatar:val('sAv'),qr:val('sQr'),qrText:val('sQrT'),fx:$('sFx').value!=='off',fxl:$('sFx').value});SV('dv_cfg',CFG);applyCfg();toast('Đã lưu cài đặt')},
+ exp(){const b=new Blob([JSON.stringify({scripts:SCRIPTS,cfg:CFG},null,1)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='data.json';a.click();URL.revokeObjectURL(a.href)},
+ imp(){$('aFile').click()},
+ rst(){if(!confirm('Xoá mọi thay đổi trên trình duyệt này?'))return;['dv_scripts','dv_cfg'].forEach(k=>localStorage.removeItem(k));location.reload()},
+ async pw(){const n=$('pNew').value;if(!sb)return toast('Chưa cấu hình Supabase');if(n.length<8)return toast('Mật khẩu mới tối thiểu 8 ký tự');const {error}=await sb.auth.updateUser({password:n});if(error)return toast('Lỗi: '+error.message);$('pNew').value='';toast('Đã cập nhật mật khẩu Supabase')}
+};
+A.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&ACT[b.dataset.a])ACT[b.dataset.a](b.dataset.i)});
+A.addEventListener('input',e=>{if(e.target.id==='aQ'){fq=e.target.value;const p=e.target.selectionStart;panel();const q=$('aQ');q.focus();q.setSelectionRange(p,p)}});
+A.addEventListener('change',e=>{if(e.target.id!=='aFile')return;const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d.scripts))throw 0;SCRIPTS=d.scripts;CFG=Object.assign({},DEF_CFG,d.cfg||{});SV('dv_scripts',SCRIPTS);SV('dv_cfg',CFG);cats=['Tất Cả',...CFG.cats];applyCfg();render();panel();toast('Đã nhập dữ liệu')}catch(x){toast('File không hợp lệ')}};r.readAsText(f)});
+A.addEventListener('change',e=>{if(e.target.id!=='sQrF')return;const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{const k=Math.min(1,600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=im.width*k;c.height=im.height*k;c.getContext('2d').drawImage(im,0,0,c.width,c.height);$('sQr').value=c.toDataURL('image/png');toast('Đã nạp ảnh — bấm Lưu cài đặt')};im.src=URL.createObjectURL(f)});
+$('qrBtn').addEventListener('click',()=>{const z=document.createElement('div');z.className='qr-zoom';z.innerHTML='<img alt="Mã QR ủng hộ" src="'+esc(CFG.qr)+'">';z.onclick=()=>z.remove();document.body.appendChild(z)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&A.classList.contains('on'))closeA()});
+$('admBtn').addEventListener('click',openLogin);
+if(location.hash==='#admin')openLogin();
+window.addEventListener('hashchange',()=>{if(location.hash==='#admin')openLogin()});
+$('yr').textContent=new Date().getFullYear();
+/* Ưu tiên dữ liệu Supabase; data.json chỉ giữ làm phương án tương thích cũ khi chưa cấu hình Supabase. */
+if(sb){sbLoadPromise=loadCloudData();}
+else if(!LS('dv_scripts'))fetch('data.json',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{if(d&&Array.isArray(d.scripts)){SCRIPTS=d.scripts;if(!LS('dv_cfg'))CFG=Object.assign({},DEF_CFG,d.cfg||{});cats=['Tất Cả',...CFG.cats];shuffle(SCRIPTS);applyCfg();render()}}).catch(()=>{});
+</script>
+<div id="prog" aria-hidden="true"></div>
+<div class="fab-wrap">
+  <button class="fab" id="fabDon" type="button" aria-label="Donate (mã QR)">❤</button>
+  <button class="fab show" id="fabRnd" type="button" aria-label="Script ngẫu nhiên">🎲</button>
+  <button class="fab" id="fabTop" type="button" aria-label="Lên đầu trang">↑</button>
+</div>
+<script>
+/* ============ Hiệu ứng & nút phụ ============ */
+(function(){
+const fd=$('fabDon'),fr=$('fabRnd'),ft=$('fabTop'),pg=$('prog'),q=$('q'),clr=$('clr');let tk=false;
+function upd(){tk=false;const y=window.scrollY,h=document.documentElement.scrollHeight-innerHeight;pg.style.transform='scaleX('+(h>0?Math.min(1,y/h):0)+')';ft.classList.toggle('show',y>400)}
+addEventListener('scroll',()=>{if(!tk){tk=true;requestAnimationFrame(upd)}},{passive:true});
+const _a=applyCfg;
+applyCfg=function(){_a();fd.classList.toggle('show',!!CFG.qr);document.documentElement.classList.toggle('no-fx',CFG.fx===false)};
+applyCfg();upd();
+fd.onclick=()=>$('qrBtn').click();
+ft.onclick=()=>scrollTo({top:0,behavior:'smooth'});
+fr.onclick=()=>{if(!SCRIPTS.length)return;const s=SCRIPTS[Math.floor(Math.random()*SCRIPTS.length)];q.value=s.game||s.hub;cat='Tất Cả';currentPage=1;render();hideSuggestions();clr.hidden=false;$('list').scrollIntoView({behavior:'smooth',block:'start'});toast('🎲 '+s.hub+(s.game?' — '+s.game:''))};
+const sync=()=>{clr.hidden=!q.value};
+q.addEventListener('input',sync);q.addEventListener('blur',sync);
+clr.onclick=()=>{q.value='';currentPage=1;render();hideSuggestions();sync();q.focus()};
+})();
+</script>
+<script>
+/* ============ Hiệu ứng mạnh: nền bay, chữ nhảy, gợn sóng, tia sáng ============ */
+(function(){
+const H=document.documentElement,RM=matchMedia('(prefers-reduced-motion: reduce)');
+const bg=document.createElement('div');bg.className='fx-bg';bg.setAttribute('aria-hidden','true');
+for(let i=0;i<12;i++){const b=document.createElement('i'),s=14+Math.random()*34;b.className='bub';b.style.cssText='left:'+(Math.random()*100)+'%;width:'+s+'px;height:'+s+'px;--d:'+(10+Math.random()*10)+'s;--dl:-'+(Math.random()*14)+'s';bg.appendChild(b)}
+document.body.prepend(bg);
+function split(el,words){const t=el.textContent;el.setAttribute('aria-label',t);el.classList.add('wv');let i=0;
+  el.innerHTML=(words?t.split(/(\s+)/):[...t]).map(p=>/^\s+$/.test(p)?p:'<span aria-hidden="true" style="--i:'+(i++)+'">'+esc(p)+'</span>').join('');
+  el.classList.remove('wv-in');void el.offsetWidth;el.classList.add('wv-in');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('wv-in'),2400)}
+const _b=applyCfg;
+applyCfg=function(){_b();const L=CFG.fx===false?'off':(CFG.fxl||'strong');H.classList.toggle('no-fx',L==='off');H.classList.toggle('fx-strong',L==='strong');split($('pName'));split($('hTitle'),1)};
+applyCfg();
+document.addEventListener('pointerdown',e=>{
+  if(!H.classList.contains('fx-strong')||RM.matches)return;
+  const b=e.target.closest('.btn-link,.tags button,.pagination button,.yt-btn,.tt-btn,.search-box button,.fab,.audio-player-card');if(!b)return;
+  if(!b.matches('.fab,.audio-player-card')){const r=b.getBoundingClientRect(),d=Math.max(r.width,r.height)*2,s=document.createElement('span');s.className='rip';s.style.cssText='width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';b.appendChild(s);setTimeout(()=>s.remove(),600)}
+  for(let i=0;i<7;i++){const p=document.createElement('span'),a=Math.PI*2*i/7+Math.random()*.6,m=34+Math.random()*30;p.className='spk';p.textContent=['✦','★','✧','♥'][i%4];p.style.cssText='left:'+e.clientX+'px;top:'+e.clientY+'px;color:'+['#ffca3a','#ff4fa3','#38bdf8','#5cb85c'][i%4]+';--dx:'+Math.cos(a)*m+'px;--dy:'+Math.sin(a)*m+'px';document.body.appendChild(p);setTimeout(()=>p.remove(),700)}
+},{passive:true});
+})();
+</script>
+</body></html>
